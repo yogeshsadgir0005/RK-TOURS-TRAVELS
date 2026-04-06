@@ -1,0 +1,43 @@
+{
+  "states": [
+    {
+      "name": "Maharashtra",
+      "districts": [
+        {
+          "name": "Pune",
+          "cities": ["Pune City", "Pimpri-Chinchwad", "Lonavala", "Khandala"]
+        },
+        {
+          "name": "Mumbai",
+          "cities": ["Mumbai City", "Navi Mumbai", "Thane", "Kalyan"]
+        },
+        {
+          "name": "Nashik",
+          "cities": ["Nashik City", "Malegaon", "Igatpuri"]
+        }
+      ]
+    },
+    {
+      "name": "Delhi",
+      "districts": [
+        {
+          "name": "New Delhi",
+          "cities": ["New Delhi", "Connaught Place", "Dwarka"]
+        }
+      ]
+    },
+    {
+      "name": "Uttar Pradesh",
+      "districts": [
+        {
+          "name": "Agra",
+          "cities": ["Agra", "Fatehpur Sikri"]
+        },
+        {
+          "name": "Gautam Buddha Nagar",
+          "cities": ["Noida", "Greater Noida"]
+        }
+      ]
+    }
+  ]
+}
