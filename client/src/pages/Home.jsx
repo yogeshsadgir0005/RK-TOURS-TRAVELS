@@ -147,7 +147,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Popular Routes Section */}
+      {/* Popular Routes Section (NOW 2:2 MOBILE GRID) */}
       <section className="pt-12 pb-8 sm:pt-24 sm:pb-16 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="text-center mb-6 sm:mb-12">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-black mb-1 sm:mb-3 tracking-tight">Popular Routes</h2>
@@ -156,50 +156,51 @@ const Home = () => {
         {loadingRoutes ? (
           <div className="flex justify-center py-8 sm:py-12"><div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-t-4 border-b-4 border-black"></div></div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
             {popularRoutes.map((route) => (
               <div 
                 key={route._id} 
                 onClick={() => navigate(`/search?pickup=${route.pickupCity}&drop=${route.destinationCity}&date=${new Date().toISOString().split('T')[0]}&trip=one-way`, { state: { selectedRoute: route } })} 
-                className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 hover:border-black shadow-sm hover:shadow-xl transition-all duration-300 p-4 sm:p-6 relative overflow-hidden h-full flex flex-col cursor-pointer group"
+                className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 hover:border-black shadow-sm hover:shadow-xl transition-all duration-300 p-3 sm:p-6 relative overflow-hidden h-full flex flex-col cursor-pointer group"
               >
-                <div className="absolute top-0 right-0 w-16 h-16 sm:w-24 sm:h-24 bg-gray-50 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-gray-100"></div>
+                <div className="absolute top-0 right-0 w-12 h-12 sm:w-24 sm:h-24 bg-gray-50 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-gray-100"></div>
                 
-                <div className="flex-grow space-y-3 sm:space-y-5 relative z-10">
-                  <div className="flex items-start gap-3 sm:gap-4">
-                    <div className="mt-0.5 sm:mt-1 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
-                      <FiMapPin className="text-green-600 w-3 h-3 sm:w-4 sm:h-4" />
+                <div className="flex-grow space-y-2 sm:space-y-5 relative z-10">
+                  <div className="flex items-start gap-2 sm:gap-4">
+                    <div className="mt-0.5 sm:mt-1 w-5 h-5 sm:w-8 sm:h-8 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
+                      <FiMapPin className="text-green-600 w-2.5 h-2.5 sm:w-4 sm:h-4" />
                     </div>
                     <div>
-                      <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5 sm:mb-1">Pickup From</p>
-                      <p className="font-bold text-black text-sm sm:text-lg leading-tight">{route.pickupCity}</p>
-                      {route.pickupStreet && <p className="text-[10px] sm:text-sm text-gray-500 mt-0.5 sm:mt-1 line-clamp-1">{route.pickupStreet}</p>}
+                      <p className="text-[8px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5 sm:mb-1">Pickup From</p>
+                      {route.pickupStreet && <p className="text-[8px] sm:text-sm text-black font-bold mt-0.5 sm:mt-1 line-clamp-1">{route.pickupStreet}</p>}
+                      <p className="font-bold text-black text-[11px] sm:text-lg leading-tight line-clamp-1">{route.pickupCity}</p>
                     </div>
                   </div>
 
-                  <div className="pl-3 sm:pl-4 py-0.5 sm:py-1">
-                    <div className="w-0.5 h-4 sm:h-6 bg-gray-200"></div>
+                  <div className="pl-2.5 sm:pl-4 py-0 sm:py-1">
+                    <div className="w-0.5 h-3 sm:h-6 bg-gray-200"></div>
                   </div>
 
-                  <div className="flex items-start gap-3 sm:gap-4">
-                    <div className="mt-0.5 sm:mt-1 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
-                      <FiMapPin className="text-red-600 w-3 h-3 sm:w-4 sm:h-4" />
+                  <div className="flex items-start gap-2 sm:gap-4">
+                    <div className="mt-0.5 sm:mt-1 w-5 h-5 sm:w-8 sm:h-8 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
+                      <FiMapPin className="text-red-600 w-2.5 h-2.5 sm:w-4 sm:h-4" />
                     </div>
                     <div>
-                      <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5 sm:mb-1">Drop To</p>
-                      <p className="font-bold text-black text-sm sm:text-lg leading-tight">{route.destinationCity}</p>
-                      {route.destinationStreet && <p className="text-[10px] sm:text-sm text-gray-500 mt-0.5 sm:mt-1 line-clamp-1">{route.destinationStreet}</p>}
+                      <p className="text-[8px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5 sm:mb-1">Drop To</p>
+                          {route.destinationStreet && <p className="text-[8px] sm:text-sm text-black font-bold mt-0.5 sm:mt-1 line-clamp-1">{route.destinationStreet}</p>}
+                      <p className="font-bold text-black text-[11px] sm:text-lg leading-tight line-clamp-1">{route.destinationCity}</p>
+                  
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-5 sm:mt-8 pt-3 sm:pt-5 border-t border-gray-100 flex items-center justify-between relative z-10">
+                <div className="mt-4 sm:mt-8 pt-2.5 sm:pt-5 border-t border-gray-100 flex flex-wrap items-center justify-between relative z-10 gap-1.5 sm:gap-0">
                   <div className="flex flex-col">
-                     <span className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider">Distance</span>
-                     <span className="font-bold text-black text-xs sm:text-base">{route.distance} km</span>
+                     <span className="text-[8px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider">Distance</span>
+                     <span className="font-bold text-black text-[10px] sm:text-base">{route.distance} km</span>
                   </div>
-                  <div className="flex items-center text-black font-bold group-hover:underline text-xs sm:text-base">
-                    View Cabs <FiArrowRight className="ml-1 sm:ml-2 transition-transform group-hover:translate-x-1" />
+                  <div className="flex items-center text-black font-bold group-hover:underline text-[9px] sm:text-base">
+                    View <FiArrowRight className="ml-0.5 sm:ml-2 transition-transform group-hover:translate-x-1" />
                   </div>
                 </div>
               </div>

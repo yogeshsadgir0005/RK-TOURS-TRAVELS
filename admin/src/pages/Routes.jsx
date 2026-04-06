@@ -5,15 +5,14 @@ import Loader from '../components/Loader';
 import CityAutocomplete from '../components/CityAutocomplete';
 import { FiMapPin } from 'react-icons/fi';
 import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
-
-// IMPORTANT: Adjust this path depending on exactly where your cities.json is located!
 import citiesData from '../data/cities.json'; 
 
 const mapContainerStyle = { width: '100%', height: '250px', borderRadius: '0.75rem' };
-const defaultCenter = { lat: 19.0760, lng: 72.8777 }; // Default to Mumbai
+const defaultCenter = { lat: 19.0760, lng: 72.8777 }; 
 
 const RoutesPage = () => {
   const [routes, setRoutes] = useState([]);
+  const [allCabs, setAllCabs] = useState([]); // NEW: Store all cabs for the dropdown
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
   const [showForm, setShowForm] = useState(false);
@@ -35,21 +34,32 @@ const RoutesPage = () => {
 
   const [distance, setDistance] = useState('');
   const [basePrice, setBasePrice] = useState('');
+  
+  // NEW: Custom Cab Pricing State
+  const [cabFares, setCabFares] = useState([]);
 
   const resetForm = () => {
     setPickupCity(''); setPickupStreet(''); setPickupState(''); setPickupCoords(defaultCenter);
     setDropCity(''); setDropStreet(''); setDropState(''); setDropCoords(defaultCenter);
-    setDistance(''); setBasePrice(''); setEditingId(null);
+    setDistance(''); setBasePrice(''); setCabFares([]); setEditingId(null);
   };
 
-  const fetchRoutes = async () => {
+  const fetchInitialData = async () => {
     try {
-      const res = await axiosInstance.get('/routes');
-      setRoutes(res.data);
-    } catch (error) { console.error(error); } finally { setLoading(false); }
+      const [routesRes, cabsRes] = await Promise.all([
+        axiosInstance.get('/routes'),
+        axiosInstance.get('/cabs')
+      ]);
+      setRoutes(routesRes.data);
+      setAllCabs(cabsRes.data);
+    } catch (error) { 
+        console.error(error); 
+    } finally { 
+        setLoading(false); 
+    }
   };
 
-  useEffect(() => { fetchRoutes(); }, []);
+  useEffect(() => { fetchInitialData(); }, []);
 
   const geocodeAddress = useCallback((address, setCoordsCallback) => {
     if (!window.google) return;
@@ -104,13 +114,17 @@ const RoutesPage = () => {
     e.preventDefault();
     if (!pickupCity || !dropCity) { alert('Cities are required'); return; }
 
+    // Clean empty cab fares
+    const filteredCabFares = cabFares.filter(cf => cf.cab && cf.fare);
+
     const payload = {
       pickupStreet: pickupStreet,
       pickupCity: pickupCity,
       destinationStreet: dropStreet,
       destinationCity: dropCity,
       distance: Number(distance),
-      basePrice: Number(basePrice)
+      basePrice: Number(basePrice),
+      cabFares: filteredCabFares
     };
 
     try {
@@ -121,7 +135,7 @@ const RoutesPage = () => {
       }
       resetForm();
       setShowForm(false);
-      fetchRoutes();
+      fetchInitialData();
     } catch (error) { alert('Operation failed'); }
   };
 
@@ -133,6 +147,15 @@ const RoutesPage = () => {
     setDropCity(route.destinationCity);
     setDistance(route.distance);
     setBasePrice(route.basePrice);
+    
+    // Map existing custom fares into state
+    if (route.cabFares) {
+      setCabFares(route.cabFares.map(cf => ({
+        cab: cf.cab._id || cf.cab,
+        fare: cf.fare
+      })));
+    }
+    
     setEditingId(route._id);
     setShowForm(true);
   };
@@ -141,7 +164,7 @@ const RoutesPage = () => {
     if (window.confirm('Delete this route?')) {
       try {
         await axiosInstance.delete(`/routes/${id}`);
-        fetchRoutes();
+        fetchInitialData();
       } catch (error) { 
         alert('Delete failed'); 
       }
@@ -249,7 +272,33 @@ const RoutesPage = () => {
 
             </div>
 
-            <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+            {/* NEW INTEGRATION: Custom Cab Pricing Section */}
+            <div className="bg-blue-50 p-6 rounded-xl border border-blue-100 mb-8 mt-8">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h4 className="font-bold text-gray-800 text-lg">Custom Cab Pricing</h4>
+                  <p className="text-xs text-gray-500 mt-1">Assign specific fixed fares for specific cabs on this route.</p>
+                </div>
+                <button type="button" onClick={() => setCabFares([...cabFares, { cab: '', fare: '' }])} className="text-sm font-bold text-blue-600 bg-white border border-blue-200 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors">+ Add Cab Fare</button>
+              </div>
+              
+              {cabFares.length === 0 && <p className="text-sm text-gray-500 font-medium italic">No custom cab prices added. Cabs will use their standard per/km rate by default.</p>}
+              
+              <div className="space-y-3">
+                {cabFares.map((cf, idx) => (
+                  <div key={idx} className="flex flex-col sm:flex-row items-center gap-4 bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
+                     <select value={cf.cab} onChange={e => { const newF = [...cabFares]; newF[idx].cab = e.target.value; setCabFares(newF); }} className="w-full sm:w-1/2 px-4 py-2.5 border border-gray-200 outline-none focus:ring-2 focus:ring-blue-500 rounded-lg text-sm font-medium">
+                        <option value="">Select Cab Model...</option>
+                        {allCabs.map(c => <option key={c._id} value={c._id}>{c.name} ({c.category}) - Reg: {c.vehicleNumber || 'N/A'}</option>)}
+                     </select>
+                     <input type="number" placeholder="Fixed Fare (₹)" value={cf.fare} onChange={e => { const newF = [...cabFares]; newF[idx].fare = e.target.value; setCabFares(newF); }} className="w-full sm:w-1/3 px-4 py-2.5 border border-gray-200 outline-none focus:ring-2 focus:ring-blue-500 rounded-lg text-sm font-medium" />
+                     <button type="button" onClick={() => setCabFares(cabFares.filter((_, i) => i !== idx))} className="text-red-500 font-bold text-sm w-full sm:w-auto text-right pr-2 hover:text-red-700">Remove</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 grid grid-cols-1 md:grid-cols-3 gap-6 items-end mt-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Calculated Distance (km)</label>
                 <input 
@@ -259,14 +308,14 @@ const RoutesPage = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Fixed Base Price (₹)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Fallback Base Price (₹)</label>
                 <input 
                   type="number" required value={basePrice} onChange={e => setBasePrice(e.target.value)} 
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
                 />
               </div>
-              <button type="submit" className="bg-green-600 hover:bg-green-700 text-white w-full py-3 rounded-lg font-bold transition-all">
-                Save Route
+              <button type="submit" className="bg-green-600 hover:bg-green-700 text-white w-full py-3 rounded-lg font-bold transition-all shadow-md">
+                Save Complete Route
               </button>
             </div>
 
