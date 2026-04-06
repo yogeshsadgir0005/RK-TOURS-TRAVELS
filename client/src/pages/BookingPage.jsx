@@ -405,7 +405,7 @@ ${fareMessage}`;
                           <span>Total Driving Distance</span>
                           {tripType === 'Round Trip' && (
                             <span className="text-[10px] text-gray-400 mt-0.5 leading-tight">
-                              Outward: {dynamicDistance} km • Return: {returnDistance} km
+                               Outward: {dynamicDistance} km • Return: {returnDistance} km
                             </span>
                           )}
                         </div>
