@@ -70,7 +70,7 @@ const VerifyOTP = () => {
     setIsLoading(true);
     try {
       const response = await axiosInstance.post('/auth/verify-otp', { email: tempEmail, otp: otpValue });
-      login(response.data.user, response.data.token);
+      login(response.data, response.data.token);
       toast.success('Email verified successfully!');
       navigate('/');
     } catch (error) {

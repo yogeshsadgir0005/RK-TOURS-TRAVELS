@@ -27,10 +27,9 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const login = async (email, password) => {
-    const res = await axiosInstance.post('/auth/login', { email, password });
-    localStorage.setItem('token', res.data.token);
-    setUser(res.data);
+  const login = (userData, token) => {
+    localStorage.setItem('token', token);
+    setUser(userData);
   };
 
   const logout = () => {

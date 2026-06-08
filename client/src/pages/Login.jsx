@@ -23,7 +23,7 @@ const Login = () => {
     setIsLoading(true);
     try {
       const response = await axiosInstance.post('/auth/login', { email, password });
-      login(response.data.user, response.data.token);
+      login(response.data, response.data.token);
       toast.success('Welcome back!');
       navigate(from, { replace: true, state: location.state?.state });
     } catch (error) {
@@ -36,24 +36,22 @@ const Login = () => {
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
-        const userInfoResponse = await axiosInstance.get('https://www.googleapis.com/oauth2/v3/userinfo', {
-          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
-        });
-        
         const res = await axiosInstance.post('/auth/google', {
-          email: userInfoResponse.data.email,
-          name: userInfoResponse.data.name,
-          googleId: userInfoResponse.data.sub
+          tokenId: tokenResponse.access_token
         });
         
-        login(res.data.user, res.data.token);
+        login(res.data, res.data.token);
         toast.success('Successfully logged in with Google');
         navigate(from, { replace: true, state: location.state?.state });
       } catch (error) {
-        toast.error('Google login failed');
+        console.error('Google login API error:', error.response?.data || error.message || error);
+        toast.error(error.response?.data?.message || 'Google login failed due to API error');
       }
     },
-    onError: () => toast.error('Google login failed'),
+    onError: (err) => {
+      console.error('Google login popup error:', err);
+      toast.error('Google login popup failed');
+    },
   });
 
   return (

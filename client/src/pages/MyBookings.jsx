@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import axiosInstance from '../utils/axiosInstance';
-import { FiUser, FiBookOpen, FiClock, FiMapPin, FiCalendar, FiChevronDown, FiXCircle } from 'react-icons/fi';
+import { FiUser, FiBookOpen, FiClock, FiChevronDown, FiXCircle, FiCalendar } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import PageTransition from '../components/PageTransition';
 import SEOHead from '../components/SEOHead';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useModal } from '../context/ModalContext';
 
 const BookingAccordion = ({ booking, onCancel }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -129,6 +130,7 @@ const BookingAccordion = ({ booking, onCancel }) => {
 const MyBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { showConfirm } = useModal();
 
   useEffect(() => {
     fetchBookings();
@@ -146,9 +148,18 @@ const MyBookings = () => {
   };
 
   const handleCancelBooking = async (bookingId) => {
-    if (!window.confirm("Are you sure you want to cancel this booking?")) return;
+    const isConfirmed = await showConfirm({
+      title: 'Cancel Booking?',
+      message: 'Are you sure you want to cancel this booking? This action cannot be undone.',
+      confirmText: 'Yes, cancel',
+      cancelText: 'Keep it',
+      type: 'danger'
+    });
+    
+    if (!isConfirmed) return;
+
     try {
-      await axiosInstance.put(`/bookings/${bookingId}/status`, { status: 'cancelled' });
+      await axiosInstance.put(`/bookings/${bookingId}/status`, { status: 'Cancelled' });
       toast.success('Booking cancelled successfully');
       fetchBookings();
     } catch (error) {
@@ -159,7 +170,7 @@ const MyBookings = () => {
   return (
     <PageTransition>
       <SEOHead title="My Bookings | RK Tours" />
-      <div className="min-h-screen bg-bg-secondary pt-32 px-4 sm:px-8 pb-12 font-sans">
+      <div className="min-h-screen bg-bg-secondary pt-32 px-4 sm:px-8 pb-12 font-sans relative">
         
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-12">
           
