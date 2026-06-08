@@ -13,8 +13,9 @@ export const createCab = async (req, res, next) => {
 
 export const getAllCabs = async (req, res, next) => {
   try {
+    const limit = parseInt(req.query.limit) || 0;
     const query = req.user && req.user.role === 'admin' ? {} : { isActive: true };
-    const cabs = await Cab.find(query).sort('-createdAt');
+    const cabs = await Cab.find(query).sort('-createdAt').limit(limit);
     res.json(cabs);
   } catch (error) { next(error); }
 };

@@ -13,8 +13,8 @@ export const createRoute = async (req, res, next) => {
 
 export const getAllRoutes = async (req, res, next) => {
   try {
-    // NEW INTEGRATION: Populate the cab objects inside cabFares
-    const routes = await Route.find({}).sort('pickupCity').populate('cabFares.cab');
+    const limit = parseInt(req.query.limit) || 0;
+    const routes = await Route.find({}).sort('pickupCity').limit(limit).populate('cabFares.cab');
     res.json(routes);
   } catch (error) { next(error); }
 };
