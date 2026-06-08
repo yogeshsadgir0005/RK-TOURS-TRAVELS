@@ -2,6 +2,7 @@ import { useState, useContext, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axiosInstance from '../utils/axiosInstance';
 import { AuthContext } from '../context/AuthContext';
+import { useBranding } from '../context/BrandingContext';
 import toast from 'react-hot-toast';
 import PageTransition from '../components/PageTransition';
 import SEOHead from '../components/SEOHead';
@@ -12,6 +13,7 @@ const VerifyOTP = () => {
   const [isLoading, setIsLoading] = useState(false);
   
   const { tempEmail, login } = useContext(AuthContext);
+  const { logoUrl, siteName } = useBranding();
   const navigate = useNavigate();
   const inputRefs = useRef([]);
 
@@ -82,9 +84,26 @@ const VerifyOTP = () => {
     }
   };
 
+  const LogoDisplay = ({ mobile = false }) => {
+    if (logoUrl) {
+      return (
+        <img 
+          src={logoUrl} 
+          alt={siteName} 
+          className={`${mobile ? 'h-12' : 'h-12'} w-auto object-contain rounded-xl hover:scale-105 transition-transform duration-300`} 
+        />
+      );
+    }
+    return (
+      <div className={`w-12 h-12 ${mobile ? 'bg-black text-white' : 'bg-white text-black'} rounded-xl flex items-center justify-center font-black text-2xl shadow-saas-inner ${!mobile ? 'hover:scale-105 transition-transform duration-300' : ''}`}>
+        {siteName?.charAt(0) || 'R'}
+      </div>
+    );
+  };
+
   return (
     <PageTransition>
-      <SEOHead title="Verify Email | RK Tours" />
+      <SEOHead title={`Verify Email | ${siteName || 'RK Tours'}`} />
       <div className="min-h-screen bg-bg-secondary flex">
         
         {/* Left: Branding Visual (Hidden on Mobile) */}
@@ -94,9 +113,7 @@ const VerifyOTP = () => {
           
           <div className="relative z-10 max-w-md">
             <Link to="/" className="inline-block mb-12">
-              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-black font-black text-2xl shadow-saas-inner hover:scale-105 transition-transform duration-300">
-                R
-              </div>
+              <LogoDisplay />
             </Link>
             <h1 className="text-4xl font-extrabold text-white leading-tight tracking-tight mb-6">
               Security first.
@@ -113,9 +130,7 @@ const VerifyOTP = () => {
             
             <div className="lg:hidden flex justify-center mb-10">
               <Link to="/">
-                <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-saas-inner">
-                  R
-                </div>
+                <LogoDisplay mobile />
               </Link>
             </div>
 

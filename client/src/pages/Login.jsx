@@ -1,7 +1,9 @@
 import { useState, useContext } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axiosInstance from '../utils/axiosInstance';
+import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
+import { useBranding } from '../context/BrandingContext';
 import { FiMail, FiLock, FiArrowRight } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import PageTransition from '../components/PageTransition';
@@ -12,8 +14,10 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   
   const { login } = useContext(AuthContext);
+  const { logoUrl, siteName } = useBranding();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from || '/';
@@ -35,9 +39,17 @@ const Login = () => {
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
+      setIsGoogleLoading(true);
       try {
+        const userInfo = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+        });
+        
         const res = await axiosInstance.post('/auth/google', {
-          tokenId: tokenResponse.access_token
+          email: userInfo.data.email,
+          name: userInfo.data.name,
+          googleId: userInfo.data.sub,
+          image: userInfo.data.picture,
         });
         
         login(res.data, res.data.token);
@@ -46,6 +58,8 @@ const Login = () => {
       } catch (error) {
         console.error('Google login API error:', error.response?.data || error.message || error);
         toast.error(error.response?.data?.message || 'Google login failed due to API error');
+      } finally {
+        setIsGoogleLoading(false);
       }
     },
     onError: (err) => {
@@ -54,9 +68,26 @@ const Login = () => {
     },
   });
 
+  const LogoDisplay = ({ mobile = false }) => {
+    if (logoUrl) {
+      return (
+        <img 
+          src={logoUrl} 
+          alt={siteName} 
+          className={`${mobile ? 'h-12' : 'h-12'} w-auto object-contain rounded-xl hover:scale-105 transition-transform duration-300`} 
+        />
+      );
+    }
+    return (
+      <div className={`w-12 h-12 ${mobile ? 'bg-black text-white' : 'bg-white text-black'} rounded-xl flex items-center justify-center font-black text-2xl shadow-saas-inner ${!mobile ? 'hover:scale-105 transition-transform duration-300' : ''}`}>
+        {siteName?.charAt(0) || 'R'}
+      </div>
+    );
+  };
+
   return (
     <PageTransition>
-      <SEOHead title="Log In | RK Tours" />
+      <SEOHead title={`Log In | ${siteName || 'RK Tours'}`} />
       <div className="min-h-screen bg-bg-secondary flex">
         
         {/* Left: Branding Visual (Hidden on Mobile) */}
@@ -66,9 +97,7 @@ const Login = () => {
           
           <div className="relative z-10 max-w-md">
             <Link to="/" className="inline-block mb-12">
-              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-black font-black text-2xl shadow-saas-inner hover:scale-105 transition-transform duration-300">
-                R
-              </div>
+              <LogoDisplay />
             </Link>
             <h1 className="text-4xl font-extrabold text-white leading-tight tracking-tight mb-6">
               Your gateway to premium intercity travel.
@@ -85,9 +114,7 @@ const Login = () => {
             
             <div className="lg:hidden flex justify-center mb-10">
               <Link to="/">
-                <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-saas-inner">
-                  R
-                </div>
+                <LogoDisplay mobile />
               </Link>
             </div>
 

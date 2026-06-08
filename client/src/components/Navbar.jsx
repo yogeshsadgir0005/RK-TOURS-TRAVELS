@@ -1,28 +1,14 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useContext, useState, useEffect } from 'react';
+import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { useBranding } from '../context/BrandingContext';
 import { FiMenu, FiX, FiLogOut, FiUser } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
-import axiosInstance from '../utils/axiosInstance';
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
+  const { logoUrl, siteName } = useBranding();
   const navigate = useNavigate();
-  const [logoUrl, setLogoUrl] = useState('');
-  const [siteName, setSiteName] = useState('RK Tours');
-
-  useEffect(() => {
-    const fetchBranding = async () => {
-      try {
-        const res = await axiosInstance.get('/content');
-        if (res.data.logoUrl) setLogoUrl(res.data.logoUrl);
-        if (res.data.siteName) setSiteName(res.data.siteName);
-      } catch (err) {
-        console.error("Branding fetch failed", err);
-      }
-    };
-    fetchBranding();
-  }, []);
 
   const handleLogout = () => {
     logout();
@@ -31,12 +17,12 @@ const Navbar = () => {
 
   return (
     <>
-      <div className="fixed top-4 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
+      <div className="fixed top-4 left-0 right-0 z-50 flex justify-center px-4 sm:px-8 pointer-events-none">
         <motion.nav 
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ type: "spring", stiffness: 400, damping: 25 }}
-          className="pointer-events-auto bg-white/70 backdrop-blur-3xl border border-black/5 shadow-[var(--shadow-saas-lg)] rounded-full px-6 py-3 flex items-center justify-between w-full max-w-5xl mx-auto"
+          className="pointer-events-auto bg-white/70 backdrop-blur-3xl border border-black/5 shadow-[var(--shadow-saas-lg)] rounded-full px-8 py-3.5 flex items-center justify-between w-full max-w-7xl mx-auto"
         >
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">

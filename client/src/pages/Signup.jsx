@@ -2,6 +2,7 @@ import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axiosInstance from '../utils/axiosInstance';
 import { AuthContext } from '../context/AuthContext';
+import { useBranding } from '../context/BrandingContext';
 import { FiMail, FiLock, FiUser, FiArrowRight } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import PageTransition from '../components/PageTransition';
@@ -14,6 +15,7 @@ const Signup = () => {
   const [isLoading, setIsLoading] = useState(false);
   
   const { setTempEmail } = useContext(AuthContext);
+  const { logoUrl, siteName } = useBranding();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -31,9 +33,26 @@ const Signup = () => {
     }
   };
 
+  const LogoDisplay = ({ mobile = false }) => {
+    if (logoUrl) {
+      return (
+        <img 
+          src={logoUrl} 
+          alt={siteName} 
+          className={`${mobile ? 'h-12' : 'h-12'} w-auto object-contain rounded-xl hover:scale-105 transition-transform duration-300`} 
+        />
+      );
+    }
+    return (
+      <div className={`w-12 h-12 ${mobile ? 'bg-black text-white' : 'bg-white text-black'} rounded-xl flex items-center justify-center font-black text-2xl shadow-saas-inner ${!mobile ? 'hover:scale-105 transition-transform duration-300' : ''}`}>
+        {siteName?.charAt(0) || 'R'}
+      </div>
+    );
+  };
+
   return (
     <PageTransition>
-      <SEOHead title="Sign Up | RK Tours" />
+      <SEOHead title={`Sign Up | ${siteName || 'RK Tours'}`} />
       <div className="min-h-screen bg-bg-secondary flex">
         
         {/* Left: Branding Visual (Hidden on Mobile) */}
@@ -43,9 +62,7 @@ const Signup = () => {
           
           <div className="relative z-10 max-w-md">
             <Link to="/" className="inline-block mb-12">
-              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-black font-black text-2xl shadow-saas-inner hover:scale-105 transition-transform duration-300">
-                R
-              </div>
+              <LogoDisplay />
             </Link>
             <h1 className="text-4xl font-extrabold text-white leading-tight tracking-tight mb-6">
               Join the future of mobility.
@@ -62,9 +79,7 @@ const Signup = () => {
             
             <div className="lg:hidden flex justify-center mb-10">
               <Link to="/">
-                <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-saas-inner">
-                  R
-                </div>
+                <LogoDisplay mobile />
               </Link>
             </div>
 

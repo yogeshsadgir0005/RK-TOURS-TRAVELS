@@ -5,6 +5,7 @@ import './index.css';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ModalProvider } from './context/ModalContext';
+import { BrandingProvider } from './context/BrandingContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { HelmetProvider } from 'react-helmet-async';
 
@@ -16,11 +17,13 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <HelmetProvider>
       <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
         <BrowserRouter>
-          <AuthProvider>
-            <ModalProvider>
-              <App />
-            </ModalProvider>
-          </AuthProvider>
+          <BrandingProvider>
+            <AuthProvider>
+              <ModalProvider>
+                <App />
+              </ModalProvider>
+            </AuthProvider>
+          </BrandingProvider>
         </BrowserRouter>
       </GoogleOAuthProvider>
     </HelmetProvider>
