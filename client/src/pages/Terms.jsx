@@ -1,20 +1,48 @@
+import PageTransition from '../components/PageTransition';
 import SEOHead from '../components/SEOHead';
 
 const Terms = () => {
   return (
-    <div className="min-h-screen bg-white pt-24 pb-16">
-      <SEOHead title="Terms of Service" description="CabBooker Terms and Conditions" url="/terms" />
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 prose prose-blue">
-        <h1 className="text-4xl font-extrabold text-gray-900 mb-8">Terms of Service</h1>
-        <p className="text-gray-600 mb-4">Last updated: {new Date().toLocaleDateString()}</p>
-        <h2 className="text-2xl font-bold mt-8 mb-4">1. Acceptance of Terms</h2>
-        <p className="text-gray-600 mb-4">By accessing and using the CabBooker platform, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services.</p>
-        <h2 className="text-2xl font-bold mt-8 mb-4">2. Booking and Cancellation</h2>
-        <p className="text-gray-600 mb-4">Bookings are subject to cab availability. Users can cancel bookings prior to driver dispatch without penalty. Late cancellations may incur a fee as determined by our cancellation policy.</p>
-        <h2 className="text-2xl font-bold mt-8 mb-4">3. User Responsibilities</h2>
-        <p className="text-gray-600 mb-4">Users agree to provide accurate information, treat drivers with respect, and not use the service for any unlawful purposes.</p>
+    <PageTransition>
+      <SEOHead title="Terms of Service | RK Tours" />
+      <div className="min-h-screen bg-bg-secondary pt-32 pb-24 px-4 sm:px-8 font-sans">
+        
+        <div className="max-w-[65ch] mx-auto bg-white p-8 sm:p-12 rounded-[32px] border border-gray-100 shadow-saas-sm">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-black tracking-tight mb-2">Terms of Service</h1>
+          <p className="text-sm font-bold uppercase tracking-widest text-gray-400 mb-8 border-b border-gray-100 pb-8">Last Updated: June 2026</p>
+          
+          <div className="space-y-8 text-gray-600 font-medium leading-relaxed">
+            
+            <section>
+              <h2 className="text-xl font-bold text-black tracking-tight mb-4">1. Acceptance of Terms</h2>
+              <p>
+                By accessing and using the RK Tours platform, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service. If you do not accept these terms, you must not use our services.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-xl font-bold text-black tracking-tight mb-4">2. Service Usage</h2>
+              <p>
+                RK Tours provides a technology platform that connects users with independent cab operators. We are committed to maintaining the highest standards of service, but we are not a transportation carrier ourselves.
+              </p>
+              <p className="mt-4">
+                Users must ensure that all information provided during the booking process is accurate and up-to-date.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-xl font-bold text-black tracking-tight mb-4">3. Cancellation & Refunds</h2>
+              <p>
+                We offer a transparent cancellation policy. Bookings cancelled 24 hours prior to the scheduled pickup time are eligible for a full refund. Cancellations made within 24 hours may be subject to a cancellation fee.
+              </p>
+            </section>
+
+          </div>
+        </div>
+
       </div>
-    </div>
+    </PageTransition>
   );
 };
+
 export default Terms;

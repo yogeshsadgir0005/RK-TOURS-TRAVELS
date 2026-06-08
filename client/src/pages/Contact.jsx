@@ -1,190 +1,105 @@
-import { useState , useEffect } from 'react';
+import { useState } from 'react';
 import axiosInstance from '../utils/axiosInstance';
+import toast from 'react-hot-toast';
+import { FiMail, FiUser, FiMessageSquare, FiSend, FiMapPin, FiPhone } from 'react-icons/fi';
+import PageTransition from '../components/PageTransition';
 import SEOHead from '../components/SEOHead';
-import { FiSend, FiPhone, FiMail, FiMapPin } from 'react-icons/fi';
 
 const Contact = () => {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
-  const [status, setStatus] = useState('');
-
-    const [content, setContent] = useState({
-      logoUrl: '',
-      contactEmail: '',
-      contactPhone: '',
-      officeAddress: '',
-      facebookUrl: '',
-      twitterUrl: '',
-      instagramUrl: '',
-      siteName: ''
-    });
-  
-    useEffect(() => {
-      const fetchContent = async () => {
-        try {
-          const res = await axiosInstance.get('/content');
-          if (res.data) {
-            setContent(prev => ({ ...prev, ...res.data }));
-          }
-        } catch (error) {
-          console.error("Failed to fetch footer content", error);
-        }
-      };
-      fetchContent();
-    }, []);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatus('loading');
+    setLoading(true);
     try {
-      await axiosInstance.post('/content/contact', formData);
-      setStatus('success');
+      await axiosInstance.post('/messages', formData);
+      toast.success('Message sent successfully!');
       setFormData({ name: '', email: '', message: '' });
     } catch (error) {
-      setStatus('error');
+      toast.error('Failed to send message');
+    } finally {
+      setLoading(false);
     }
   };
 
-
-
-
   return (
-    <div className="min-h-screen bg-gray-50 font-sans pb-24">
-      <SEOHead 
-        title="Contact Us - RK Tours & Travels Customer Support" 
-        description="Get in touch with RK Tours & Travels support team. We are available 24/7 to help you with your cab bookings and queries." 
-        url="/contact" 
-        keywords="contact rk tours and travels, cab booking support, taxi customer care, hire a cab phone number"
-        schemaMarkup={{
-          "@context": "https://schema.org",
-          "@type": "ContactPage",
-          "name": "Contact RK Tours & Travels",
-          "description": "Get in touch for your travel needs."
-        }}
-      />
-      
-      {/* Header Section */}
-      <section className="bg-black pt-32 pb-32 px-4 text-center">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 tracking-tight">
-            Contact Us
-          </h1>
-          <p className="text-lg md:text-xl text-neutral-400 font-medium max-w-2xl mx-auto">
-            We'd love to hear from you
-          </p>
-        </div>
-      </section>
-
-      {/* Main Content Area */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+    <PageTransition>
+      <SEOHead title="Contact Us | RK Tours" />
+      <div className="min-h-screen bg-bg-secondary pt-32 pb-24 px-4 sm:px-8 font-sans">
+        
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16">
           
-          {/* Form Section (Left) */}
-          <div className="bg-white p-8 md:p-10 rounded-2xl shadow-lg border border-gray-200">
-            <h2 className="text-2xl font-bold text-black mb-8 tracking-tight">Send us a message</h2>
-            
-            {status === 'success' && (
-              <div className="mb-8 p-4 bg-green-50 text-green-700 rounded-xl border border-green-200 font-medium flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                Message sent successfully! We will get back to you soon.
-              </div>
-            )}
-            
-            {status === 'error' && (
-              <div className="mb-8 p-4 bg-red-50 text-red-700 rounded-xl border border-red-200 font-medium flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                Failed to send message. Please try again.
-              </div>
-            )}
+          <div>
+            <h1 className="text-4xl sm:text-5xl font-extrabold text-black tracking-tight mb-4">Get in touch</h1>
+            <p className="text-lg text-gray-500 font-medium leading-relaxed mb-12 max-w-sm">
+              Our enterprise support team is available 24/7. We guarantee a response within 15 minutes.
+            </p>
 
+            <div className="space-y-8">
+              <div className="flex items-center gap-6">
+                <div className="w-14 h-14 rounded-2xl bg-white border border-gray-100 shadow-saas-sm flex items-center justify-center">
+                  <FiMail className="text-xl text-black" />
+                </div>
+                <div>
+                  <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Email Support</h4>
+                  <p className="text-lg font-bold text-black">support@rktours.com</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-6">
+                <div className="w-14 h-14 rounded-2xl bg-white border border-gray-100 shadow-saas-sm flex items-center justify-center">
+                  <FiPhone className="text-xl text-black" />
+                </div>
+                <div>
+                  <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Priority Hotline</h4>
+                  <p className="text-lg font-bold text-black">+91 99999 99999</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-6">
+                <div className="w-14 h-14 rounded-2xl bg-white border border-gray-100 shadow-saas-sm flex items-center justify-center">
+                  <FiMapPin className="text-xl text-black" />
+                </div>
+                <div>
+                  <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Headquarters</h4>
+                  <p className="text-lg font-bold text-black">Pune, Maharashtra, IN</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white p-8 sm:p-10 rounded-[32px] border border-gray-100 shadow-saas-lg">
+            <h3 className="text-2xl font-extrabold text-black tracking-tight mb-8">Send a message</h3>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-500 mb-1.5">Name</label>
-                <input 
-                  type="text" 
-                  required 
-                  value={formData.name} 
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  className="block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-black focus:border-transparent transition-all outline-none text-black" 
-                />
+                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5 block ml-1">Full Name</label>
+                <div className="relative">
+                  <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input type="text" required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full h-12 pl-11 pr-4 bg-gray-50/50 border border-gray-200 rounded-xl text-sm font-semibold text-black focus:border-black focus:bg-white shadow-saas-inner outline-none transition-colors" />
+                </div>
               </div>
-              
               <div>
-                <label className="block text-sm font-medium text-gray-500 mb-1.5">Email</label>
-                <input 
-                  type="email" 
-                  required 
-                  value={formData.email} 
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  className="block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-black focus:border-transparent transition-all outline-none text-black" 
-                />
+                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5 block ml-1">Email Address</label>
+                <div className="relative">
+                  <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input type="email" required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full h-12 pl-11 pr-4 bg-gray-50/50 border border-gray-200 rounded-xl text-sm font-semibold text-black focus:border-black focus:bg-white shadow-saas-inner outline-none transition-colors" />
+                </div>
               </div>
-              
               <div>
-                <label className="block text-sm font-medium text-gray-500 mb-1.5">Message</label>
-                <textarea 
-                  required 
-                  rows={5} 
-                  value={formData.message} 
-                  onChange={(e) => setFormData({...formData, message: e.target.value})}
-                  className="block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-black focus:border-transparent transition-all outline-none text-black resize-none"
-                ></textarea>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5 block ml-1">Message</label>
+                <div className="relative">
+                  <FiMessageSquare className="absolute left-4 top-4 text-gray-400" />
+                  <textarea required rows="4" value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})} className="w-full pl-11 pr-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl text-sm font-semibold text-black focus:border-black focus:bg-white shadow-saas-inner outline-none transition-colors resize-none"></textarea>
+                </div>
               </div>
-              
-              <button 
-                type="submit" 
-                disabled={status === 'loading'} 
-                className="w-full flex justify-center items-center gap-2 py-3.5 px-4 rounded-xl text-white font-bold bg-black hover:bg-neutral-800 focus:outline-none focus:ring-4 focus:ring-neutral-200 disabled:opacity-70 transition-all shadow-md"
-              >
-                {status === 'loading' ? (
-                  <div className="w-5 h-5 border-2 border-neutral-600 border-t-white rounded-full animate-spin"></div>
-                ) : (
-                  <>
-                    <FiSend className="text-lg" />
-                    Send Message
-                  </>
-                )}
+              <button type="submit" disabled={loading} className="w-full h-12 bg-black text-white rounded-xl font-bold text-sm shadow-saas-glow hover:bg-neutral-800 active:scale-95 transition-all disabled:opacity-70 flex items-center justify-center gap-2">
+                {loading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <>Send Message <FiSend /></>}
               </button>
             </form>
           </div>
 
-          {/* Contact Information Section (Right) */}
-          <div className="space-y-6 lg:pl-4">
-            
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 flex items-center gap-6 hover:border-black transition-colors duration-300">
-              <div className="bg-black text-white p-4 rounded-xl flex-shrink-0">
-                <FiPhone className="text-2xl" />
-              </div>
-              <div>
-                <h3 className="font-bold text-black text-lg tracking-tight">Phone</h3>
-                <p className="text-gray-500 font-medium mt-1">{content.contactPhone}</p>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 flex items-center gap-6 hover:border-black transition-colors duration-300">
-              <div className="bg-black text-white p-4 rounded-xl flex-shrink-0">
-                <FiMail className="text-2xl" />
-              </div>
-              <div>
-                <h3 className="font-bold text-black text-lg tracking-tight">Email</h3>
-                <p className="text-gray-500 font-medium mt-1">{content.contactEmail}</p>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 flex items-center gap-6 hover:border-black transition-colors duration-300">
-              <div className="bg-black text-white p-4 rounded-xl flex-shrink-0">
-                <FiMapPin className="text-2xl" />
-              </div>
-              <div>
-                <h3 className="font-bold text-black text-lg tracking-tight">Address</h3>
-                <p className="text-gray-500 font-medium mt-1">{content.officeAddress}</p>
-              </div>
-            </div>
-
-          </div>
-
         </div>
       </div>
-    </div>
+    </PageTransition>
   );
 };
 

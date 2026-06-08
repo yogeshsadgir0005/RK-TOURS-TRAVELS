@@ -1,143 +1,163 @@
-import { useState, useContext } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useState, useContext, useRef, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import axiosInstance from '../utils/axiosInstance';
 import { AuthContext } from '../context/AuthContext';
-import SEOHead from '../components/SEOHead';
 import toast from 'react-hot-toast';
+import PageTransition from '../components/PageTransition';
+import SEOHead from '../components/SEOHead';
+import { FiArrowRight } from 'react-icons/fi';
 
 const VerifyOTP = () => {
-  const [otp, setOtp] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [otp, setOtp] = useState(new Array(6).fill(''));
+  const [isLoading, setIsLoading] = useState(false);
   
-  const location = useLocation();
+  const { tempEmail, login } = useContext(AuthContext);
   const navigate = useNavigate();
-  const { user, fetchUser } = useContext(AuthContext); // Access user to check login status
+  const inputRefs = useRef([]);
 
-  const userId = location.state?.userId;
-  const email = location.state?.email;
-  const intent = location.state?.intent || 'verify-email';
+  useEffect(() => {
+    if (!tempEmail) {
+      toast.error('Session expired. Please sign up again.');
+      navigate('/signup');
+    }
+    if (inputRefs.current[0]) {
+      inputRefs.current[0].focus();
+    }
+  }, [tempEmail, navigate]);
 
-  if (!email && !userId) {
-    navigate('/login');
-    return null;
-  }
+  const handleChange = (element, index) => {
+    if (isNaN(element.value)) return false;
+
+    setOtp([...otp.map((d, idx) => (idx === index ? element.value : d))]);
+
+    // Focus next input
+    if (element.value !== '' && index < 5) {
+      inputRefs.current[index + 1].focus();
+    }
+  };
+
+  const handleKeyDown = (e, index) => {
+    if (e.key === 'Backspace') {
+      if (otp[index] === '' && index > 0) {
+        inputRefs.current[index - 1].focus();
+      }
+    }
+  };
+
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text/plain').slice(0, 6).split('');
+    if (pastedData.some(isNaN)) return;
+
+    const newOtp = [...otp];
+    pastedData.forEach((char, index) => {
+      newOtp[index] = char;
+    });
+    setOtp(newOtp);
+
+    const nextFocusIndex = pastedData.length < 6 ? pastedData.length : 5;
+    inputRefs.current[nextFocusIndex].focus();
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
+    const otpValue = otp.join('');
+    if (otpValue.length < 6) {
+      toast.error('Please enter all 6 digits');
+      return;
+    }
     
-    const loadId = toast.loading('Verifying security code...');
-
+    setIsLoading(true);
     try {
-      if (intent === 'reset-password') {
-        await axiosInstance.post('/auth/reset-password', { email, otp, newPassword });
-        toast.success('Password reset successfully!', { id: loadId });
-        
-        // If user is already logged in (resetting from profile), go to profile.
-        // If not (forgot password flow), go to login.
-        if (user) {
-          navigate('/profile');
-        } else {
-          navigate('/login');
-        }
-      } 
-      else if (intent === 'update-profile') {
-        // For secure profile changes (Email/Phone)
-        await axiosInstance.post('/auth/verify-update', { otp });
-        await fetchUser(); // Refresh global state
-        toast.success('Changes applied successfully!', { id: loadId });
-        navigate('/profile');
-      } 
-      else {
-        // Standard Signup Verification
-        const res = await axiosInstance.post('/auth/verify-otp', { userId, otp });
-        localStorage.setItem('token', res.data.token);
-        await fetchUser();
-        toast.success('Account verified!', { id: loadId });
-        // Since verify-otp logs them in, the PublicRoute logic will take care of future attempts
-        navigate('/'); 
-      }
-    } catch (err) {
-      const msg = err.response?.data?.message || 'Invalid OTP. Please check and try again.';
-      setError(msg);
-      toast.error(msg, { id: loadId });
+      const response = await axiosInstance.post('/auth/verify-otp', { email: tempEmail, otp: otpValue });
+      login(response.data.user, response.data.token);
+      toast.success('Email verified successfully!');
+      navigate('/');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Verification failed');
+      setOtp(new Array(6).fill(''));
+      inputRefs.current[0].focus();
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 pt-24 font-sans">
-      <SEOHead title="Secure Verification | CabBook" />
-      
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-black tracking-tight">
-          {intent === 'reset-password' ? 'Reset Password' : 
-           intent === 'update-profile' ? 'Authorize Change' : 'Verify Identity'}
-        </h2>
-        <p className="mt-3 text-center text-sm font-medium text-gray-500 leading-relaxed">
-          A 6-digit security code has been sent to <br/>
-          <strong className="text-black font-bold">{email}</strong>
-        </p>
-      </div>
-
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4">
-        <div className="bg-white py-10 px-4 shadow-2xl border border-gray-100 sm:rounded-[32px] sm:px-12">
-          {error && (
-            <div className="mb-8 p-4 bg-red-50 text-red-700 rounded-2xl border border-red-100 text-xs font-bold text-center uppercase tracking-widest">
-              {error}
-            </div>
-          )}
+    <PageTransition>
+      <SEOHead title="Verify Email | RK Tours" />
+      <div className="min-h-screen bg-bg-secondary flex">
+        
+        {/* Left: Branding Visual (Hidden on Mobile) */}
+        <div className="hidden lg:flex w-1/2 bg-black relative overflow-hidden items-center justify-center p-16">
+          <div className="absolute inset-0 aurora-bg opacity-70"></div>
+          <div className="absolute inset-0 noise-overlay"></div>
           
-          <form className="space-y-8" onSubmit={handleSubmit}>
-            <div>
-              <label className="block text-[11px] font-extrabold text-gray-400 mb-4 text-center uppercase tracking-[0.3em]">
-                Enter 6-Digit Code
-              </label>
-              <input 
-                type="text" 
-                required 
-                maxLength={6} 
-                value={otp} 
-                onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))}
-                placeholder="------"
-                className="appearance-none block w-full px-3 py-5 bg-gray-50 border-none rounded-2xl text-center text-4xl tracking-[0.4em] font-black text-black focus:ring-2 focus:ring-black focus:bg-white transition-all shadow-inner outline-none" 
-              />
+          <div className="relative z-10 max-w-md">
+            <Link to="/" className="inline-block mb-12">
+              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-black font-black text-2xl shadow-saas-inner hover:scale-105 transition-transform duration-300">
+                R
+              </div>
+            </Link>
+            <h1 className="text-4xl font-extrabold text-white leading-tight tracking-tight mb-6">
+              Security first.
+            </h1>
+            <p className="text-lg text-gray-400 font-medium leading-relaxed">
+              We need to verify your email address to ensure the security of your account and future bookings.
+            </p>
+          </div>
+        </div>
+
+        {/* Right: Form */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative">
+          <div className="w-full max-w-sm">
+            
+            <div className="lg:hidden flex justify-center mb-10">
+              <Link to="/">
+                <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-saas-inner">
+                  R
+                </div>
+              </Link>
             </div>
 
-            {intent === 'reset-password' && (
-              <div className="animate-in slide-in-from-bottom-2 duration-300">
-                <label className="block text-xs font-bold text-gray-700 mb-2 ml-1">Set New Password</label>
-                <input 
-                  type="password" 
-                  required 
-                  minLength={6}
-                  value={newPassword} 
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="appearance-none block w-full px-5 py-4 bg-gray-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-black focus:bg-white transition-all sm:text-sm text-black outline-none" 
-                />
+            <div className="mb-10 text-center lg:text-left">
+              <h2 className="text-3xl font-extrabold text-black tracking-tight mb-2">Check your email</h2>
+              <p className="text-sm text-gray-500 font-medium">We've sent a 6-digit code to <span className="font-bold text-black">{tempEmail}</span></p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-8">
+              
+              <div className="flex justify-between gap-2" onPaste={handlePaste}>
+                {otp.map((data, index) => (
+                  <input
+                    key={index}
+                    type="text"
+                    maxLength="1"
+                    ref={(el) => (inputRefs.current[index] = el)}
+                    value={data}
+                    onChange={(e) => handleChange(e.target, index)}
+                    onKeyDown={(e) => handleKeyDown(e, index)}
+                    className="w-12 h-12 sm:w-14 sm:h-14 text-center text-2xl font-black bg-gray-50/50 border border-gray-200 rounded-xl focus:border-black focus:bg-white shadow-saas-inner outline-none transition-colors"
+                  />
+                ))}
               </div>
-            )}
-            
-            <button 
-              type="submit" 
-              disabled={loading || otp.length < 6}
-              className="w-full flex justify-center items-center py-4 px-4 border border-transparent rounded-2xl shadow-xl text-sm font-black text-white bg-black hover:bg-neutral-800 focus:outline-none focus:ring-4 focus:ring-neutral-200 transition-all disabled:opacity-40 uppercase tracking-widest"
-            >
-              {loading ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              ) : (
-                'Confirm & Continue'
-              )}
-            </button>
-          </form>
+
+              <button 
+                type="submit" 
+                disabled={isLoading}
+                className="w-full h-12 mt-4 bg-gradient-to-b from-neutral-800 to-black text-white rounded-xl font-bold text-sm shadow-saas-glow border border-black/10 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-70 disabled:hover:scale-100"
+              >
+                {isLoading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <>Verify & Continue <FiArrowRight /></>}
+              </button>
+            </form>
+
+            <p className="mt-8 text-center text-sm text-gray-500 font-medium">
+              Didn't receive the code? <button className="text-black font-bold hover:underline">Resend</button>
+            </p>
+          </div>
         </div>
+
       </div>
-    </div>
+    </PageTransition>
   );
 };
 

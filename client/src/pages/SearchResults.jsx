@@ -1,10 +1,36 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axiosInstance from '../utils/axiosInstance';
-import CityAutocomplete from '../components/CityAutocomplete';
-import { FiMapPin, FiCalendar, FiArrowRight, FiUsers, FiSearch, FiRefreshCw, FiChevronDown } from 'react-icons/fi';
-import { FaCarSide } from 'react-icons/fa';
+import { FiMapPin, FiArrowRight, FiUsers, FiFilter, FiSettings } from 'react-icons/fi';
 import SEOHead from '../components/SEOHead';
+import PageTransition from '../components/PageTransition';
+import { CabSkeleton } from '../components/SkeletonLoader';
+import { GoogleMap, Marker, Polyline, useJsApiLoader } from '@react-google-maps/api';
+
+const mapContainerStyle = { width: '100%', height: '100%', borderRadius: '1.5rem' };
+const darkMapStyle = [
+  { elementType: "geometry", stylers: [{ color: "#212121" }] },
+  { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#757575" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#212121" }] },
+  { featureType: "administrative", elementType: "geometry", stylers: [{ color: "#757575" }] },
+  { featureType: "administrative.country", elementType: "labels.text.fill", stylers: [{ color: "#9e9e9e" }] },
+  { featureType: "administrative.land_parcel", stylers: [{ visibility: "off" }] },
+  { featureType: "administrative.locality", elementType: "labels.text.fill", stylers: [{ color: "#bdbdbd" }] },
+  { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#757575" }] },
+  { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#181818" }] },
+  { featureType: "poi.park", elementType: "labels.text.fill", stylers: [{ color: "#616161" }] },
+  { featureType: "poi.park", elementType: "labels.text.stroke", stylers: [{ color: "#1b1b1b" }] },
+  { featureType: "road", elementType: "geometry.fill", stylers: [{ color: "#2c2c2c" }] },
+  { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#8a8a8a" }] },
+  { featureType: "road.arterial", elementType: "geometry", stylers: [{ color: "#373737" }] },
+  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#3c3c3c" }] },
+  { featureType: "road.highway.controlled_access", elementType: "geometry", stylers: [{ color: "#4e4e4e" }] },
+  { featureType: "road.local", elementType: "labels.text.fill", stylers: [{ color: "#616161" }] },
+  { featureType: "transit", elementType: "labels.text.fill", stylers: [{ color: "#757575" }] },
+  { featureType: "water", elementType: "geometry", stylers: [{ color: "#000000" }] },
+  { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#3d3d3d" }] }
+];
 
 const SearchResults = () => {
   const location = useLocation();
@@ -13,8 +39,8 @@ const SearchResults = () => {
   const { selectedRoute } = location.state || {};
   const queryParams = new URLSearchParams(location.search);
   
-  const [pickup, setPickup] = useState(queryParams.get('pickup') || '');
-  const [drop, setDrop] = useState(queryParams.get('drop') || '');
+  const [pickup] = useState(queryParams.get('pickup') || '');
+  const [drop] = useState(queryParams.get('drop') || '');
   const [date, setDate] = useState(queryParams.get('date') || '');
   const [tripType, setTripType] = useState(queryParams.get('trip') || 'one-way');
   const [cabType, setCabType] = useState(queryParams.get('type') || '');
@@ -22,25 +48,32 @@ const SearchResults = () => {
   const [cabs, setCabs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [isCabDropdownOpen, setIsCabDropdownOpen] = useState(false);
-  const cabDropdownRef = useRef(null);
+  const { isLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+  });
+  
+  const [pickupCoords, setPickupCoords] = useState(null);
+  const [dropCoords, setDropCoords] = useState(null);
 
-  const cabOptions = [
-    { value: '', label: 'Any Cab' },
-    { value: 'sedan', label: 'Sedan' },
-    { value: 'suv', label: 'SUV' },
-    { value: 'hatchback', label: 'Hatchback' }
-  ];
+  const geocodeAddress = useCallback((address, setCoordsCallback) => {
+    if (!window.google) return;
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode({ address }, (results, status) => {
+      if (status === 'OK' && results[0]) {
+        setCoordsCallback({
+          lat: results[0].geometry.location.lat(),
+          lng: results[0].geometry.location.lng()
+        });
+      }
+    });
+  }, []);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (cabDropdownRef.current && !cabDropdownRef.current.contains(event.target)) {
-        setIsCabDropdownOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    if (!isLoaded) return;
+    if (pickup) geocodeAddress(pickup, setPickupCoords);
+    if (drop) geocodeAddress(drop, setDropCoords);
+  }, [pickup, drop, geocodeAddress, isLoaded]);
 
   useEffect(() => {
     const fetchAndFilterCabs = async () => {
@@ -55,7 +88,6 @@ const SearchResults = () => {
           );
         }
 
-        // Smart Sorting for Fixed Fare Cabs
         if (selectedRoute && selectedRoute.cabFares && selectedRoute.cabFares.length > 0) {
             const fixedFareCabs = [];
             const standardCabs = [];
@@ -85,15 +117,6 @@ const SearchResults = () => {
     fetchAndFilterCabs();
   }, [location.search, cabType, selectedRoute]);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if(!pickup || !drop || !date) {
-        alert("Please fill pickup, drop, and date to search.");
-        return;
-    }
-    navigate(`/search?pickup=${pickup}&drop=${drop}&date=${date}&type=${cabType}&trip=${tripType}`, { state: { selectedRoute } });
-  };
-
   const handleProceedToBook = (cab) => {
     navigate('/book', {
       state: { 
@@ -111,237 +134,167 @@ const SearchResults = () => {
     });
   };
 
+  const getMapBounds = () => {
+    if (!window.google || !pickupCoords || !dropCoords) return null;
+    const bounds = new window.google.maps.LatLngBounds();
+    bounds.extend(pickupCoords);
+    bounds.extend(dropCoords);
+    return bounds;
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 pb-8 sm:pb-12 pt-20 sm:pt-28 px-3 sm:px-6 lg:px-8 font-sans">
-      <SEOHead title="Search Results | CabBook" />
-      <div className="max-w-7xl mx-auto">
+    <PageTransition>
+      <div className="min-h-screen bg-bg-secondary font-sans pb-20">
+        <SEOHead title={`${pickup} to ${drop} Cabs | RK Tours`} />
         
-        {selectedRoute ? (
-          <div className="bg-black py-6 mt-6 sm:py-12 rounded-2xl sm:rounded-3xl shadow-xl mb-6 sm:mb-8 px-4 sm:px-6 md:px-8">
-            <h1 className="text-xl sm:text-2xl font-extrabold text-white mb-4 sm:mb-8">Route Details</h1>
-            <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 flex flex-col lg:flex-row gap-4 sm:gap-8 lg:items-center justify-between shadow-sm border border-gray-100">
-                
-                <div className="flex-grow flex flex-col md:flex-row items-start md:items-center gap-4 sm:gap-6">
-                    <div className="flex-1 w-full">
-                        <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-2">
-                            <FiMapPin className="text-green-600 w-3 h-3 sm:w-4 sm:h-4" />
-                            <span className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest">Pickup</span>
-                        </div>
-                        <p className="text-sm sm:text-xl font-bold text-black">{selectedRoute.pickupCity}</p>
-                        <p className="text-[10px] sm:text-sm text-gray-500 mt-0.5 sm:mt-1 line-clamp-1">{selectedRoute.pickupStreet || 'City Limits'}</p>
-                    </div>
-
-                    <div className="hidden md:flex flex-col items-center justify-center px-4">
-                        <p className="text-[10px] sm:text-xs font-bold text-gray-400 mb-2">{selectedRoute.distance} km</p>
-                        <FiArrowRight className="text-gray-300 text-xl sm:text-2xl" />
-                    </div>
-
-                    <div className="flex-1 w-full border-t md:border-t-0 md:border-l border-gray-100 pt-3 md:pt-0 md:pl-6">
-                        <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-2">
-                            <FiMapPin className="text-red-600 w-3 h-3 sm:w-4 sm:h-4" />
-                            <span className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest">Drop-off</span>
-                        </div>
-                        <p className="text-sm sm:text-xl font-bold text-black">{selectedRoute.destinationCity}</p>
-                        <p className="text-[10px] sm:text-sm text-gray-500 mt-0.5 sm:mt-1 line-clamp-1">{selectedRoute.destinationStreet || 'City Limits'}</p>
-                    </div>
-                </div>
-
-                <div className="lg:w-72 flex flex-col gap-3 sm:gap-4 border-t lg:border-t-0 lg:border-l border-gray-100 pt-4 sm:pt-6 lg:pt-0 lg:pl-8">
-                   <div>
-                       <label className="block text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 sm:mb-2">Travel Date</label>
-                       <input 
-                         type="date" 
-                         value={date} 
-                         onChange={(e) => setDate(e.target.value)} 
-                         className="w-full px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-base bg-gray-50 border border-gray-200 rounded-lg sm:rounded-xl focus:bg-white focus:ring-2 focus:ring-black outline-none font-medium"
-                       />
-                   </div>
-                   <div>
-                       <label className="block text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 sm:mb-2">Trip Type</label>
-                       <select 
-                         value={tripType} 
-                         onChange={(e) => setTripType(e.target.value)} 
-                         className="w-full px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-base bg-gray-50 border border-gray-200 rounded-lg sm:rounded-xl focus:bg-white focus:ring-2 focus:ring-black outline-none font-medium appearance-none"
-                       >
-                           <option value="one-way">One Way</option>
-                           <option value="round-trip">Round Trip</option>
-                       </select>
-                   </div>
-                </div>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-gray-200 p-4 sm:p-6 lg:p-8 text-left mb-6 sm:mb-8">
-            <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-              <button 
-                onClick={() => setTripType('one-way')}
-                className={`flex items-center gap-1.5 sm:gap-2 px-4 py-2 sm:px-6 sm:py-2.5 rounded-full font-medium text-xs sm:text-sm transition-all duration-200 ${
-                  tripType === 'one-way' ? 'bg-black text-white shadow-md' : 'bg-transparent text-gray-500 hover:text-black hover:bg-gray-100'
-                }`}
-              >
-                <FiArrowRight /> One Way
-              </button>
-              <button 
-                onClick={() => setTripType('round-trip')}
-                className={`flex items-center gap-1.5 sm:gap-2 px-4 py-2 sm:px-6 sm:py-2.5 rounded-full font-medium text-xs sm:text-sm transition-all duration-200 ${
-                  tripType === 'round-trip' ? 'bg-black text-white shadow-md' : 'bg-transparent text-gray-500 hover:text-black hover:bg-gray-100'
-                }`}
-              >
-                <FiRefreshCw /> Round Trip
-              </button>
-            </div>
-
-            <form onSubmit={handleSearch}>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
-                
-                <div className="flex flex-col gap-1.5 sm:gap-2 relative">
-                  <label className="text-[11px] sm:text-[13px] font-medium text-gray-500 ml-1">Pickup Location</label>
-                  <CityAutocomplete value={pickup} onChange={setPickup} placeholder="Enter city" icon={FiMapPin} iconColorClass="text-black" />
-                </div>
-
-                <div className="flex flex-col gap-1.5 sm:gap-2 relative">
-                  <label className="text-[11px] sm:text-[13px] font-medium text-gray-500 ml-1">Drop Location</label>
-                  <CityAutocomplete value={drop} onChange={setDrop} placeholder="Enter city" icon={FiMapPin} iconColorClass="text-black" />
-                </div>
-
-                <div className="flex flex-col gap-1.5 sm:gap-2">
-                  <label className="text-[11px] sm:text-[13px] font-medium text-gray-500 ml-1">Travel Date</label>
-                  <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gray-50 focus-within:ring-2 focus-within:ring-black">
-                    <div className="absolute inset-y-0 left-0 pl-3 sm:pl-3.5 flex items-center pointer-events-none z-10">
-                      <FiCalendar className="text-black text-sm sm:text-lg" />
-                    </div>
-                    <input 
-                      type="date" 
-                      required 
-                      value={date} 
-                      onChange={(e) => setDate(e.target.value)} 
-                      className="w-full pl-9 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3.5 border-none outline-none text-black bg-transparent transition-all text-xs sm:text-sm font-medium relative z-20 cursor-pointer
-                      [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer" 
-                    />
+        {/* DASHBOARD HEADER */}
+        <div className="bg-bg-inverse pt-32 pb-24 px-4 sm:px-8 relative overflow-hidden">
+          <div className="absolute inset-0 noise-overlay"></div>
+          
+          <div className="max-w-7xl mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
+            
+            {/* Left: Route Info */}
+            <div className="flex flex-col justify-center">
+              <div className="flex items-center gap-4 mb-6">
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">{pickup}</h1>
+                <FiArrowRight className="text-zinc-600 text-2xl" />
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">{drop}</h1>
+              </div>
+              
+              {selectedRoute && (
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-md">
+                    <span className="text-zinc-400 text-xs font-mono">{selectedRoute.distance} KM</span>
+                  </div>
+                  <div className="px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-md">
+                    <span className="text-zinc-400 text-xs font-mono">EST. {(selectedRoute.distance / 60).toFixed(1)} HRS</span>
                   </div>
                 </div>
+              )}
 
-                <div className="flex flex-col gap-1.5 sm:gap-2" ref={cabDropdownRef}>
-                  <label className="text-[11px] sm:text-[13px] font-medium text-gray-500 ml-1">Cab Type</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 sm:pl-3.5 flex items-center pointer-events-none z-10">
-                      <FaCarSide className="text-black text-sm sm:text-lg" />
-                    </div>
-                    <div 
-                      onClick={() => setIsCabDropdownOpen(!isCabDropdownOpen)}
-                      className="w-full pl-9 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3.5 bg-gray-50 border-none rounded-xl sm:rounded-2xl text-black transition-all text-xs sm:text-sm font-medium cursor-pointer flex items-center justify-between select-none focus-within:ring-2 focus-within:ring-black"
-                    >
-                      <span>{cabOptions.find(opt => opt.value === cabType)?.label || 'Any Cab'}</span>
-                      <FiChevronDown className={`text-gray-500 text-base sm:text-lg transition-transform duration-200 ${isCabDropdownOpen ? 'rotate-180' : ''}`} />
-                    </div>
+              {/* Filters */}
+              <div className="flex flex-wrap items-center gap-4">
+                <input 
+                  type="date" 
+                  value={date} 
+                  onChange={(e) => setDate(e.target.value)} 
+                  className="bg-zinc-900 border border-zinc-800 text-white rounded-xl px-4 py-3 text-sm font-semibold focus:ring-1 focus:ring-white outline-none"
+                />
+                <select 
+                  value={tripType} 
+                  onChange={(e) => setTripType(e.target.value)} 
+                  className="bg-zinc-900 border border-zinc-800 text-white rounded-xl px-4 py-3 text-sm font-semibold focus:ring-1 focus:ring-white outline-none appearance-none pr-8"
+                >
+                  <option value="one-way">One Way</option>
+                  <option value="round-trip">Round Trip</option>
+                </select>
+                <select 
+                  value={cabType} 
+                  onChange={(e) => setCabType(e.target.value)} 
+                  className="bg-zinc-900 border border-zinc-800 text-white rounded-xl px-4 py-3 text-sm font-semibold focus:ring-1 focus:ring-white outline-none appearance-none pr-8"
+                >
+                  <option value="">Any Vehicle</option>
+                  <option value="sedan">Sedan</option>
+                  <option value="suv">SUV</option>
+                  <option value="hatchback">Hatchback</option>
+                </select>
+              </div>
+            </div>
 
-                    {isCabDropdownOpen && (
-                      <div className="absolute top-[calc(100%+4px)] sm:top-[calc(100%+8px)] left-0 right-0 bg-white rounded-xl sm:rounded-2xl shadow-xl border border-gray-100 py-1.5 sm:py-2 z-50 animate-in fade-in zoom-in-95 duration-100">
-                        {cabOptions.map((option) => (
-                          <div
-                            key={option.value}
-                            onClick={() => {
-                              setCabType(option.value);
-                              setIsCabDropdownOpen(false);
-                            }}
-                            className={`px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium cursor-pointer transition-colors flex items-center ${
-                              cabType === option.value ? 'bg-gray-50 text-black font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-black'
-                            }`}
-                          >
-                            {option.label}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+            {/* Right: Embedded Map */}
+            <div className="hidden lg:block w-full h-[240px] bg-zinc-900 rounded-[24px] border border-zinc-800 p-2 shadow-2xl">
+              {isLoaded && pickupCoords && dropCoords ? (
+                <GoogleMap 
+                  mapContainerStyle={mapContainerStyle} 
+                  options={{ styles: darkMapStyle, disableDefaultUI: true, gestureHandling: 'none' }}
+                  onLoad={(map) => {
+                    const bounds = getMapBounds();
+                    if (bounds) map.fitBounds(bounds);
+                  }}
+                >
+                  <Marker position={pickupCoords} icon={{ path: window.google.maps.SymbolPath.CIRCLE, scale: 6, fillColor: '#ffffff', fillOpacity: 1, strokeColor: '#000000', strokeWeight: 2 }} />
+                  <Marker position={dropCoords} icon={{ path: window.google.maps.SymbolPath.CIRCLE, scale: 6, fillColor: '#ffffff', fillOpacity: 1, strokeColor: '#000000', strokeWeight: 2 }} />
+                  <Polyline path={[pickupCoords, dropCoords]} options={{ strokeColor: '#ffffff', strokeOpacity: 0.5, strokeWeight: 3, geodesic: true }} />
+                </GoogleMap>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center rounded-xl bg-zinc-900/50">
+                   <div className="w-6 h-6 border-2 border-zinc-600 border-t-zinc-400 rounded-full animate-spin"></div>
                 </div>
+              )}
+            </div>
 
-              </div>
-
-              <div>
-                <button type="submit" className="inline-flex items-center justify-center gap-1.5 sm:gap-2 bg-black hover:bg-neutral-800 text-white px-6 sm:px-8 py-2.5 sm:py-3.5 rounded-xl sm:rounded-2xl font-medium text-xs sm:text-sm transition-all shadow-md w-full sm:w-auto focus:outline-none focus:ring-4 focus:ring-neutral-200">
-                  <FiSearch className="w-4 h-4 sm:w-[18px] sm:h-[18px]" /> Search Cabs
-                </button>
-              </div>
-            </form>
           </div>
-        )}
-
-        <div className="flex justify-between items-end mb-4 sm:mb-6">
-          <h2 className="text-lg sm:text-xl font-bold text-black tracking-tight">Available Cabs ({cabs.length})</h2>
         </div>
-        
-        {loading ? (
-          <div className="flex justify-center py-8 sm:py-12"><div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-t-4 border-b-4 border-black"></div></div>
-        ) : cabs.length === 0 ? (
-          <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-200 p-8 sm:p-12 text-center">
-            <h3 className="text-base sm:text-lg font-bold text-black mb-2">No cabs found</h3>
-            <p className="text-xs sm:text-sm text-gray-500">We couldn't find any cabs matching your selected criteria. Try changing the cab type or search parameters.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
-            {cabs.map((cab) => (
-              <div key={cab._id} className={`bg-white rounded-[16px] sm:rounded-[24px] border ${cab.customFixedFare ? 'border-gray-800 shadow-md relative overflow-hidden' : 'border-gray-200'} flex flex-col hover:border-black transition-all duration-300`}>
-                
-                {/* Badge for custom matched route (Black instead of Green) */}
-                {cab.customFixedFare && (
-                  <div className="absolute top-0 right-0 bg-black text-white text-[8px] sm:text-[10px] font-bold px-2 py-1 sm:px-4 sm:py-1.5 rounded-bl-lg sm:rounded-bl-xl z-20 shadow-sm uppercase tracking-widest">
-                    Best Match
-                  </div>
-                )}
 
-                <div className="h-28 sm:h-48 w-full bg-gray-50 overflow-hidden relative border-b border-gray-100 flex items-center justify-center p-2 sm:p-4">
-                  <img src={cab.image || 'https://via.placeholder.com/400x300?text=Cab'} alt={cab.name} className="max-w-full max-h-full object-contain mix-blend-multiply" />
-                  <div className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-white px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[8px] sm:text-[10px] font-bold text-black shadow-sm z-10 tracking-wider border border-gray-200">
-                    {cab.acStatus || 'AC'}
-                  </div>
-                </div>
-                
-                <div className="p-3 sm:p-6 flex flex-col flex-grow">
-                  <div className="flex flex-col sm:flex-row sm:justify-between items-start mb-2 sm:mb-4">
-                    <div>
-                      <h3 className="text-sm sm:text-xl font-bold text-black tracking-tight leading-tight line-clamp-1">{cab.name}</h3>
-                      <p className="text-gray-500 text-[10px] sm:text-sm capitalize mt-0.5">{cab.category || 'Standard'}</p>
-                    </div>
-                    
-                    {/* Dynamically render either Fixed Fare or Per Km */}
-                    {cab.customFixedFare ? (
-                        <div className="text-left sm:text-right mt-1 sm:mt-0">
-                          <div className="text-[8px] sm:text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-0.5 sm:mb-1">Fixed Fare</div>
-                          <div className="text-base sm:text-2xl font-extrabold text-black">₹{cab.customFixedFare}</div>
-                        </div>
-                      ) : (
-                        <div className="text-left sm:text-right mt-1 sm:mt-0">
-                          <div className="text-base sm:text-2xl font-extrabold text-black">₹{cab.pricePerKm}<span className="text-[10px] sm:text-sm text-gray-500 font-medium">/km</span></div>
-                        </div>
-                    )}
+        {/* CAB LISTING (SaaS Horizontal Rows) */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 -mt-8 relative z-20">
+          {loading ? (
+            <div className="flex flex-col gap-4">
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} className="bg-white rounded-2xl h-32 animate-pulse border border-gray-100"></div>
+              ))}
+            </div>
+          ) : cabs.length === 0 ? (
+            <div className="bg-white rounded-[32px] shadow-saas-sm border border-gray-100 p-12 text-center">
+              <h3 className="text-xl font-extrabold text-black mb-2 tracking-tight">No Vehicles Available</h3>
+              <p className="text-sm font-medium text-gray-500">Try adjusting your filters or selecting a different date.</p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4">
+              {cabs.map((cab) => (
+                <div key={cab._id} className="bg-white rounded-[24px] p-4 sm:p-6 border border-gray-100 shadow-saas-sm flex flex-col md:flex-row items-center gap-6 hover:border-black/10 hover:shadow-saas-md transition-all duration-300 group">
+                  
+                  {/* Left: Image */}
+                  <div className="w-full md:w-40 h-28 bg-gray-50 rounded-[16px] p-2 flex items-center justify-center flex-shrink-0 group-hover:bg-gray-100 transition-colors">
+                    <img src={cab.image || 'https://via.placeholder.com/400x300?text=Cab'} alt={cab.name} className="max-w-full max-h-full object-contain drop-shadow-[0_10px_10px_rgba(0,0,0,0.1)] group-hover:scale-105 transition-transform duration-300" />
                   </div>
                   
-                  <div className="flex items-center gap-1.5 sm:gap-3 text-gray-700 mb-3 sm:mb-6 font-medium flex-wrap">
-                    <span className="flex items-center gap-1 sm:gap-1.5 bg-gray-100 px-1.5 py-1 sm:px-3 sm:py-1.5 rounded-md sm:rounded-xl text-[10px] sm:text-sm">
-                      <FiUsers className="text-black w-3 h-3 sm:w-4 sm:h-4"/> {cab.seats}
-                    </span>
-                    <span className="flex items-center gap-1 sm:gap-1.5 bg-gray-100 px-1.5 py-1 sm:px-3 sm:py-1.5 rounded-md sm:rounded-xl text-[10px] sm:text-sm">
-                      <svg className="w-3 h-3 sm:w-4 sm:h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                      {cab.fuelType || 'Petrol'}
-                    </span>
+                  {/* Middle: Details */}
+                  <div className="flex-grow w-full">
+                    <div className="flex items-center gap-3 mb-1">
+                      <h3 className="text-xl font-extrabold text-black tracking-tight">{cab.name}</h3>
+                      <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-[9px] font-black uppercase tracking-widest">{cab.category || 'Sedan'}</span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-3 flex-wrap">
+                      <span className="h-6 px-2.5 bg-gray-50 border border-gray-100 rounded-md text-[10px] font-bold uppercase text-gray-500 flex items-center gap-1.5"><FiUsers className="text-black" /> {cab.seats} Seats</span>
+                      <span className="h-6 px-2.5 bg-gray-50 border border-gray-100 rounded-md text-[10px] font-bold uppercase text-gray-500 flex items-center gap-1.5"><FiFilter className="text-black" /> {cab.fuelType || 'Petrol'}</span>
+                      <span className="h-6 px-2.5 bg-gray-50 border border-gray-100 rounded-md text-[10px] font-bold uppercase text-gray-500 flex items-center gap-1.5"><FiSettings className="text-black" /> {cab.acStatus || 'AC'}</span>
+                    </div>
                   </div>
 
-                  <button 
-                    onClick={() => handleProceedToBook(cab)}
-                    className="mt-auto w-full bg-black hover:bg-neutral-800 text-white py-2 sm:py-3.5 rounded-lg sm:rounded-xl font-bold transition-all flex justify-center items-center gap-1.5 sm:gap-2 text-[11px] sm:text-base shadow-sm focus:outline-none focus:ring-4 focus:ring-neutral-200"
-                  >
-                    <span className="hidden sm:inline">Select & Book</span>
-                    <span className="sm:hidden">Select</span>
-                    <FiArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
-                  </button>
+                  {/* Right: Price & Action */}
+                  <div className="flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto md:min-w-[140px] border-t md:border-t-0 border-gray-100 pt-4 md:pt-0">
+                    <div className="text-left md:text-right mb-0 md:mb-4">
+                      {cab.customFixedFare ? (
+                        <>
+                          <div className="text-xs font-bold uppercase tracking-widest text-green-600 mb-0.5">Fixed Fare</div>
+                          <div className="text-2xl font-black text-black tracking-tighter">₹{cab.customFixedFare}</div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Estimated</div>
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-2xl font-black text-black tracking-tighter">₹{cab.pricePerKm}</span>
+                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">/km</span>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                    <button 
+                      onClick={() => handleProceedToBook(cab)}
+                      className="w-auto md:w-full px-6 py-3 bg-black text-white rounded-xl font-bold text-sm shadow-saas-glow hover:bg-neutral-800 active:scale-95 transition-all"
+                    >
+                      Select
+                    </button>
+                  </div>
+
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </PageTransition>
   );
 };
 

@@ -1,21 +1,15 @@
-import { useState, useEffect, useContext } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { FaCar } from 'react-icons/fa';
+import { FiMenu, FiX, FiLogOut, FiUser } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
 import axiosInstance from '../utils/axiosInstance';
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-  
-  const [logoUrl, setLogoUrl] = useState('');
-  const [siteName, setSiteName] = useState('CabBook');
-  
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
-  const location = useLocation();
-
-  const isHomePage = location.pathname === '/';
+  const [logoUrl, setLogoUrl] = useState('');
+  const [siteName, setSiteName] = useState('RK Tours');
 
   useEffect(() => {
     const fetchBranding = async () => {
@@ -28,17 +22,6 @@ const Navbar = () => {
       }
     };
     fetchBranding();
-
-    const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleLogout = () => {
@@ -46,100 +29,64 @@ const Navbar = () => {
     navigate('/login');
   };
 
-  const navBackgroundClass = (isHomePage && !isScrolled)
-    ? 'bg-black/20 backdrop-blur-md border-b border-transparent' 
-    : 'bg-black border-b border-neutral-800';
-
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${navBackgroundClass}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20">
-          
-          <Link to="/" className="flex items-center gap-3 group">
+    <>
+      <div className="fixed top-4 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
+        <motion.nav 
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+          className="pointer-events-auto bg-white/70 backdrop-blur-3xl border border-black/5 shadow-[var(--shadow-saas-lg)] rounded-full px-6 py-3 flex items-center justify-between w-full max-w-5xl mx-auto"
+        >
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2 group">
             {logoUrl ? (
-              <img src={logoUrl} alt={siteName} className="h-10 w-auto object-contain transition-transform group-hover:scale-105" />
-              
+              <img src={logoUrl} alt={siteName} className="h-8 w-auto object-contain rounded-[8px] transition-transform duration-300 group-hover:scale-105" />
             ) : (
-              <>
-                <div className="text-white group-hover:scale-110 transition-transform">
-                  <FaCar className="text-2xl" />
-                </div>
-              </>
+              <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center text-white font-black text-xl shadow-[var(--shadow-saas-inner)] group-hover:scale-105 transition-transform duration-300">
+                {siteName.charAt(0)}
+              </div>
             )}
-            
-                <span className="font-bold text-lg text-white tracking-tight">{siteName}</span>
+            <span className="font-extrabold text-xl tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-black to-neutral-600">
+              {siteName}
+            </span>
           </Link>
 
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-8">
-            <Link to="/" className={`text-sm font-medium transition-colors ${location.pathname === '/' ? 'text-white' : 'text-neutral-400 hover:text-white'}`}>Home</Link>
-            <Link to="/about" className={`text-sm font-medium transition-colors ${location.pathname === '/about' ? 'text-white' : 'text-neutral-400 hover:text-white'}`}>About</Link>
-            <Link to="/contact" className={`text-sm font-medium transition-colors ${location.pathname === '/contact' ? 'text-white' : 'text-neutral-400 hover:text-white'}`}>Contact</Link>
-          </div>
-
-          {/* User Controls */}
-          <div className="hidden md:flex items-center gap-4">
-            {user ? (
-              <div className="flex items-center gap-4">
-                <Link to="/my-bookings" className="text-sm font-medium text-neutral-400 hover:text-white transition-colors">My Bookings</Link>
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-1">
+            <Link to="/" className="text-sm font-semibold text-gray-600 hover:text-black px-4 py-2 rounded-full hover:bg-gray-100/50 transition-colors">Home</Link>
+            <Link to="/about" className="text-sm font-semibold text-gray-600 hover:text-black px-4 py-2 rounded-full hover:bg-gray-100/50 transition-colors">About</Link>
+            <Link to="/contact" className="text-sm font-semibold text-gray-600 hover:text-black px-4 py-2 rounded-full hover:bg-gray-100/50 transition-colors">Contact</Link>
             
-                  <Link to="/profile" className="px-5 py-2 bg-white text-black text-sm font-bold rounded-full hover:bg-neutral-200 transition-all">Profile</Link>
-                
-                <button onClick={handleLogout} className="text-sm font-bold text-red-400 hover:text-red-300 transition-colors">Logout</button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-3">
-                <Link to="/login" className="text-sm font-medium text-white hover:text-neutral-300 px-4 py-2 transition-colors">Log in</Link>
-                <Link to="/signup" className="px-6 py-2.5 bg-white text-black text-sm font-bold rounded-full hover:bg-neutral-200 transition-all shadow-lg shadow-white/5">Sign up</Link>
-              </div>
-            )}
-          </div>
-
-          {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
-            <button onClick={() => setIsOpen(!isOpen)} className="text-white hover:text-neutral-300 p-2 transition-colors">
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                {isOpen ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /> : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />}
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isOpen && (
-        <div className="md:hidden bg-black border-b border-neutral-800 animate-in slide-in-from-top duration-300">
-          <div className="px-4 pt-2 pb-6 space-y-2">
-            <Link to="/" onClick={() => setIsOpen(false)} className="block px-4 py-3 text-base font-medium text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-xl transition-colors">Home</Link>
-            <Link to="/about" onClick={() => setIsOpen(false)} className="block px-4 py-3 text-base font-medium text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-xl transition-colors">About</Link>
-            <Link to="/contact" onClick={() => setIsOpen(false)} className="block px-4 py-3 text-base font-medium text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-xl transition-colors">Contact</Link>
+            <div className="w-px h-6 bg-gray-200 mx-2"></div>
             
             {user ? (
-              <>
-                <div className="h-px bg-neutral-800 my-4 mx-4"></div>
-                <Link to="/my-bookings" onClick={() => setIsOpen(false)} className="block px-4 py-3 text-base font-medium text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-xl transition-colors">My Bookings</Link>
-                <Link to="/profile" onClick={() => setIsOpen(false)} className="block px-4 py-3 text-base font-medium text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-xl transition-colors">Profile</Link>
-                <button 
-                  onClick={handleLogout} 
-                  className="w-full text-left block px-4 py-3 text-base font-medium text-red-400 hover:bg-neutral-800 rounded-xl transition-colors"
-                >
-                  Logout
+              <div className="flex items-center gap-2">
+                <Link to="/my-bookings" className="text-sm font-semibold text-gray-600 hover:text-black px-4 py-2 rounded-full hover:bg-gray-100/50 transition-colors">My Bookings</Link>
+                <Link to="/profile" className="flex items-center gap-2 text-sm font-semibold text-black px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
+                  <div className="w-5 h-5 rounded-full bg-black text-white flex items-center justify-center text-[10px] font-bold">
+                    {user.name ? user.name.charAt(0).toUpperCase() : <FiUser />}
+                  </div>
+                  {user.name?.split(' ')[0] || 'Account'}
+                </Link>
+                <button onClick={handleLogout} className="w-9 h-9 flex items-center justify-center rounded-full text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors">
+                  <FiLogOut className="text-lg" />
                 </button>
-              </>
+              </div>
             ) : (
-              <div className="grid grid-cols-2 gap-4 pt-2">
-                <Link to="/login" onClick={() => setIsOpen(false)} className="flex justify-center items-center px-4 py-2.5 border border-neutral-700 text-base font-medium rounded-full text-white hover:bg-neutral-800 transition-colors">
-                  Log in
-                </Link>
-                <Link to="/signup" onClick={() => setIsOpen(false)} className="flex justify-center items-center px-4 py-2.5 border border-transparent text-base font-medium rounded-full text-black bg-white hover:bg-neutral-200 transition-colors">
-                  Sign up
+              <div className="flex items-center gap-2 ml-2">
+                <Link to="/login" className="text-sm font-bold text-black px-5 py-2.5 rounded-full hover:bg-gray-100 transition-colors">Log In</Link>
+                <Link to="/signup" className="text-sm font-bold text-white bg-gradient-to-b from-neutral-800 to-black border border-black/10 px-5 py-2.5 rounded-full shadow-[var(--shadow-saas-sm)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200">
+                  Sign Up
                 </Link>
               </div>
             )}
           </div>
-        </div>
-      )}
-    </nav>
+
+          {/* Mobile Menu Toggle (Removed because bottom bar exists) */}
+        </motion.nav>
+      </div>
+    </>
   );
 };
 

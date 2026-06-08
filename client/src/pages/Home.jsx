@@ -1,33 +1,82 @@
-import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import SEOHead from '../components/SEOHead';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import axiosInstance from '../utils/axiosInstance';
 import CityAutocomplete from '../components/CityAutocomplete';
+import heroImage from '../assets/hero.png';
 import { 
   FiMapPin, FiArrowRight, FiShield, FiClock, FiDollarSign, 
-  FiStar, FiUsers, FiSearch, FiCalendar, FiRefreshCw, FiFilter, FiChevronDown
+  FiUsers, FiFilter, FiStar
 } from 'react-icons/fi';
-import { FaStar, FaCarSide } from 'react-icons/fa';
+import { motion, useMotionValue, useTransform } from 'framer-motion';
+import PageTransition from '../components/PageTransition';
+import { RouteSkeleton } from '../components/SkeletonLoader';
+import SEOHead from '../components/SEOHead';
+
+// 3D Tilt Card Component
+const TiltCard = ({ children, onClick, className }) => {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const mouseXSpring = useTransform(x, [-0.5, 0.5], [10, -10]);
+  const mouseYSpring = useTransform(y, [-0.5, 0.5], [-10, 10]);
+
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+    x.set(xPct);
+    y.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <motion.div
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      onClick={onClick}
+      style={{
+        rotateY: mouseXSpring,
+        rotateX: mouseYSpring,
+        transformStyle: "preserve-3d",
+      }}
+      className={`relative ${className}`}
+      whileHover={{ scale: 1.02 }}
+      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+    >
+      {/* Glossy overlay */}
+      <div className="absolute inset-0 z-20 rounded-[32px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-tr from-white/0 via-white/5 to-white/20"></div>
+      <div style={{ transform: "translateZ(30px)" }}>
+        {children}
+      </div>
+    </motion.div>
+  );
+};
 
 const Home = () => {
   const navigate = useNavigate();
-  
-  // Data States
-  const [popularRoutes, setPopularRoutes] = useState([]);
-  const [cabs, setCabs] = useState([]);
-  const [testimonials, setTestimonials] = useState([]);
-  const [heroBg, setHeroBg] = useState('https://images.unsplash.com/photo-1609521263047-f8f205293f24?q=80&w=2070&auto=format&fit=crop');
-  const [loadingRoutes, setLoadingRoutes] = useState(true);
-  const [loadingCabs, setLoadingCabs] = useState(true);
-  const [loadingTestimonials, setLoadingTestimonials] = useState(true);
-
-  // Search Widget States (Date & Cab Type removed from UI, but kept in state for routing)
-  const [tripType, setTripType] = useState('one-way');
   const [pickup, setPickup] = useState('');
   const [drop, setDrop] = useState('');
   
+  const [popularRoutes, setPopularRoutes] = useState([]);
+  const [loadingRoutes, setLoadingRoutes] = useState(true);
+  const [cabs, setCabs] = useState([]);
+  const [loadingCabs, setLoadingCabs] = useState(true);
+  const [testimonials, setTestimonials] = useState([]);
+  const [loadingTestimonials, setLoadingTestimonials] = useState(true);
+  const [heroBg, setHeroBg] = useState('https://images.unsplash.com/photo-1609521263047-f8f205293f24?q=80&w=2070&auto=format&fit=crop');
+
+  const [tripType, setTripType] = useState('one-way');
+
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchHomeData = async () => {
       try {
         const [routesRes, cabsRes, testimonialsRes, contentRes] = await Promise.all([
           axiosInstance.get('/routes'),
@@ -38,313 +87,334 @@ const Home = () => {
         setPopularRoutes(routesRes.data.slice(0, 6));
         setCabs(cabsRes.data.slice(0, 4));
         setTestimonials(testimonialsRes.data.slice(0, 3));
-        
         if (contentRes.data.heroImageUrl) {
           setHeroBg(contentRes.data.heroImageUrl);
         }
       } catch (error) {
-        console.error("Failed to fetch data", error);
+        console.error("Error fetching home data:", error);
       } finally {
         setLoadingRoutes(false);
         setLoadingCabs(false);
         setLoadingTestimonials(false);
       }
     };
-    fetchData();
+    fetchHomeData();
   }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if(!pickup || !drop) {
-        alert("Please enter both pickup and drop locations to search.");
-        return;
+    if (!pickup || !drop) {
+      alert("Please enter pickup and drop locations.");
+      return;
     }
-    // Automatically inject today's date for seamless routing to SearchResults page
     const today = new Date().toISOString().split('T')[0];
-    navigate(`/search?pickup=${pickup}&drop=${drop}&date=${today}&type=&trip=${tripType}`);
+    navigate(`/search?pickup=${pickup}&drop=${drop}&date=${today}&trip=${tripType}`);
+  };
+
+  const handleSwap = () => {
+    const temp = pickup;
+    setPickup(drop);
+    setDrop(temp);
   };
 
   const features = [
-    { icon: FiShield, title: 'Safe Rides', desc: 'Verified drivers and GPS-tracked rides for your safety.' },
-    { icon: FiClock, title: 'On Time', desc: 'Punctual pickup and drop-off, guaranteed.' },
-    { icon: FiDollarSign, title: 'Best Prices', desc: 'Transparent pricing with no hidden charges.' },
-    { icon: FiStar, title: 'Top Rated', desc: '4.8/5 average rating from 50,000+ riders.' },
+    { icon: FiShield, title: "Verified Drivers", desc: "Every partner undergoes strict background checks." },
+    { icon: FiDollarSign, title: "Transparent Pricing", desc: "No hidden charges. What you see is what you pay." },
+    { icon: FiClock, title: "On-Time Guarantee", desc: "Reliable pickups, every single time." },
+    { icon: FiStar, title: "Premium Fleet", desc: "Well-maintained, clean, and comfortable cars." }
   ];
 
   return (
-    <div className="min-h-screen bg-white font-sans pb-8 sm:pb-12">
-      <SEOHead 
-        title="Reliable Intercity Cabs & Taxi Service" 
-        description="Book affordable one-way and round-trip cabs instantly. Top-rated cab booking website offering reliable taxi service across India." 
-        url="/" 
-        keywords="cab booking website, taxi service, book a cab online, intercity cabs, one way taxi, round trip cabs"
-        schemaMarkup={{
-          "@context": "https://schema.org",
-          "@type": "TravelAgency",
-          "name": "RK Tours & Travels",
-          "url": "https://rk-tours-travels.vercel.app",
-          "logo": "https://rk-tours-travels.vercel.app/favicon.svg",
-          "description": "Top-rated cab booking website offering reliable and affordable taxi service across India.",
-          "telephone": "+91-9999999999",
-          "address": {
-            "@type": "PostalAddress",
-            "addressLocality": "Pune",
-            "addressRegion": "Maharashtra",
-            "addressCountry": "IN"
-          }
-        }}
-      />
-      
-      {/* HERO SECTION */}
-      <section className="bg-black pt-24 pb-16 px-3 sm:pt-32 sm:pb-40 sm:px-4 relative overflow-hidden min-h-[70vh] sm:min-h-[85vh] flex flex-col justify-center">
-        <div 
-          className="absolute inset-0 z-0 opacity-60 lg:opacity-90 pointer-events-none transition-all duration-700"
-          style={{
-            backgroundImage: `url('${heroBg}')`,
-            backgroundPosition: 'right center',
-            backgroundSize: 'cover',
-            backgroundRepeat: 'no-repeat',
-            maskImage: 'linear-gradient(to right, black 40%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(to right, black 40%, transparent 95%)'
-          }}
-        ></div>
-
-        <div className="max-w-7xl w-full mx-auto relative z-10 mt-6 sm:mt-0 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-12">
-          
-          <div className="max-w-2xl text-left">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[72px] font-bold text-white mb-3 sm:mb-6 tracking-tight leading-[1.1]">
-              Book Your Ride, <br className="hidden sm:block" />
-              Anytime Anywhere
-            </h1>
-            <p className="text-sm sm:text-lg lg:text-xl text-gray-200 max-w-xl font-medium tracking-wide drop-shadow-md">
-              Reliable, comfortable, and affordable cab booking across 100+ cities in India.
-            </p>
-          </div>
-
-          {/* REDESIGNED: Uber-Style Compact Search Widget */}
-          <div className="relative z-20 max-w-[420px] w-full">
-            <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 text-left border border-gray-100">
-              
-              <h2 className="text-3xl font-extrabold text-black mb-6 tracking-tight">Get a ride</h2>
-
-              {/* Sleek Tabs */}
-              <div className="flex items-center gap-2 mb-6 bg-gray-100 p-1.5 rounded-xl w-max">
-                <button 
-                  onClick={() => setTripType('one-way')} 
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm transition-all duration-200 ${tripType === 'one-way' ? 'bg-white text-black shadow-sm' : 'bg-transparent text-gray-500 hover:text-black'}`}
-                >
-                  One Way
-                </button>
-                <button 
-                  onClick={() => setTripType('round-trip')} 
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm transition-all duration-200 ${tripType === 'round-trip' ? 'bg-white text-black shadow-sm' : 'bg-transparent text-gray-500 hover:text-black'}`}
-                >
-                  Round Trip
-                </button>
-              </div>
-
-              <form onSubmit={handleSearch} className="flex flex-col gap-4">
-                
-                {/* Pickup */}
-                <div className="flex flex-col gap-1 w-full">
-                  <CityAutocomplete value={pickup} onChange={setPickup} placeholder="Pickup location" icon={FiMapPin} iconColorClass="text-black" />
-                </div>
-
-                {/* Drop */}
-                <div className="flex flex-col gap-1 w-full">
-                  <CityAutocomplete value={drop} onChange={setDrop} placeholder="Dropoff location" icon={FiMapPin} iconColorClass="text-black" />
-                </div>
-
-                <div className="pt-3">
-                  <button type="submit" className="w-full h-14 bg-black hover:bg-neutral-800 text-white rounded-xl font-bold text-base transition-all shadow-lg flex items-center justify-center transform hover:-translate-y-0.5">
-                    Search Cabs
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-          
-        </div>
-      </section>
-
-      {/* Popular Routes Section (NOW 2:2 MOBILE GRID) */}
-      <section className="pt-12 pb-8 sm:pt-24 sm:pb-16 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-        <div className="text-center mb-6 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-black mb-1 sm:mb-3 tracking-tight">Popular Routes</h2>
-          <p className="text-xs sm:text-sm text-gray-500 font-medium">Most booked intercity routes by our customers</p>
-        </div>
-        {loadingRoutes ? (
-          <div className="flex justify-center py-8 sm:py-12"><div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-t-4 border-b-4 border-black"></div></div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
-            {popularRoutes.map((route) => (
-              <div 
-                key={route._id} 
-                onClick={() => navigate(`/search?pickup=${route.pickupCity}&drop=${route.destinationCity}&date=${new Date().toISOString().split('T')[0]}&trip=one-way`, { state: { selectedRoute: route } })} 
-                className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 hover:border-black shadow-sm hover:shadow-xl transition-all duration-300 p-3 sm:p-6 relative overflow-hidden h-full flex flex-col cursor-pointer group"
-              >
-                <div className="absolute top-0 right-0 w-12 h-12 sm:w-24 sm:h-24 bg-gray-50 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-gray-100"></div>
-                
-                <div className="flex-grow space-y-2 sm:space-y-5 relative z-10">
-                  <div className="flex items-start gap-2 sm:gap-4">
-                    <div className="mt-0.5 sm:mt-1 w-5 h-5 sm:w-8 sm:h-8 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
-                      <FiMapPin className="text-green-600 w-2.5 h-2.5 sm:w-4 sm:h-4" />
-                    </div>
-                    <div>
-                      <p className="text-[8px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5 sm:mb-1">Pickup From</p>
-                      {route.pickupStreet && <p className="text-[8px] sm:text-sm text-black font-bold mt-0.5 sm:mt-1 line-clamp-1">{route.pickupStreet}</p>}
-                      <p className="font-bold text-black text-[11px] sm:text-lg leading-tight line-clamp-1">{route.pickupCity}</p>
-                    </div>
-                  </div>
-
-                  <div className="pl-2.5 sm:pl-4 py-0 sm:py-1">
-                    <div className="w-0.5 h-3 sm:h-6 bg-gray-200"></div>
-                  </div>
-
-                  <div className="flex items-start gap-2 sm:gap-4">
-                    <div className="mt-0.5 sm:mt-1 w-5 h-5 sm:w-8 sm:h-8 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
-                      <FiMapPin className="text-red-600 w-2.5 h-2.5 sm:w-4 sm:h-4" />
-                    </div>
-                    <div>
-                      <p className="text-[8px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5 sm:mb-1">Drop To</p>
-                          {route.destinationStreet && <p className="text-[8px] sm:text-sm text-black font-bold mt-0.5 sm:mt-1 line-clamp-1">{route.destinationStreet}</p>}
-                      <p className="font-bold text-black text-[11px] sm:text-lg leading-tight line-clamp-1">{route.destinationCity}</p>
-                  
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-4 sm:mt-8 pt-2.5 sm:pt-5 border-t border-gray-100 flex flex-wrap items-center justify-between relative z-10 gap-1.5 sm:gap-0">
-                  <div className="flex flex-col">
-                     <span className="text-[8px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider">Distance</span>
-                     <span className="font-bold text-black text-[10px] sm:text-base">{route.distance} km</span>
-                  </div>
-                  <div className="flex items-center text-black font-bold group-hover:underline text-[9px] sm:text-base">
-                    View <FiArrowRight className="ml-0.5 sm:ml-2 transition-transform group-hover:translate-x-1" />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* Our Fleet Section */}
-      <section className="py-8 sm:py-16 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-        <div className="text-center mb-6 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-black mb-1 sm:mb-3 tracking-tight">Our Fleet</h2>
-          <p className="text-xs sm:text-sm text-gray-500 font-medium">Choose from our wide range of vehicles</p>
-        </div>
+    <PageTransition>
+      <div className="font-sans bg-bg-secondary min-h-screen">
+        <SEOHead 
+          title="Premium SaaS Cab Booking | RK Tours" 
+          description="The most advanced intercity cab booking platform."
+          url="/"
+        />
         
-        {loadingCabs ? (
-          <div className="flex justify-center py-8 sm:py-12">
-            <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-t-4 border-b-4 border-black"></div>
+        {/* HERO SECTION - DYNAMIC IMAGE BACKGROUND */}
+        <section className="relative min-h-screen flex items-center justify-center pt-32 pb-20 px-4 overflow-hidden">
+          {/* Background Image */}
+          <div className="absolute inset-0 z-0">
+             <img src={heroBg} alt="Hero Background" className="w-full h-full object-cover" />
+             <div className="absolute inset-0 bg-black/50"></div>
           </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-            {cabs.map((cab) => (
-              <div key={cab._id} className="bg-white rounded-[16px] sm:rounded-[24px] border border-gray-200 overflow-hidden flex flex-col hover:border-black transition-all duration-300">
-                
-                <div className="h-28 sm:h-48 w-full bg-gray-50 relative p-2 sm:p-4 flex items-center justify-center border-b border-gray-100">
-                  <img 
-                    src={cab.image || 'https://via.placeholder.com/400x300?text=Cab'} 
-                    alt={cab.name} 
-                    className="max-w-full max-h-full object-contain" 
-                  />
-                  <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-white border border-gray-200 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[9px] sm:text-[11px] font-bold text-black shadow-sm z-10 tracking-wide">
-                    {cab.acStatus || 'AC'}
-                  </div>
-                </div>
+          
+          <div className="relative z-20 w-full max-w-7xl mx-auto flex flex-col items-center">
+            
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              className="text-center w-full"
+            >
+              <h1 className="text-[48px] sm:text-[64px] lg:text-[80px] font-extrabold text-white leading-[1.1] text-center mb-6 max-w-4xl mx-auto">
+                Book Your Ride, <br className="sm:hidden" />
+                Anytime Anywhere
+              </h1>
+              <p className="text-lg md:text-xl text-gray-200 max-w-2xl text-center mx-auto font-medium mb-12">
+                Reliable, comfortable, and affordable cab booking across 100+ cities in India.
+              </p>
+            </motion.div>
 
-                <div className="px-3 pb-3 pt-2 sm:px-6 sm:pb-6 sm:pt-4 flex flex-col flex-grow">
-                  <div className="flex flex-col sm:flex-row sm:justify-between items-start mb-2 sm:mb-4">
-                    <div>
-                      <h3 className="text-sm sm:text-xl font-bold text-black leading-tight">{cab.name}</h3>
-                      <p className="text-gray-500 text-[10px] sm:text-sm capitalize mt-0.5">{cab.category || 'Sedan'}</p>
+            {/* THE GLASS SEARCH WIDGET */}
+            <motion.div 
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: "spring", stiffness: 400, damping: 30, delay: 0.1 }}
+              className="max-w-4xl mx-auto w-full relative z-30"
+            >
+              <div className="bg-white/90 backdrop-blur-3xl rounded-[28px] p-6 sm:p-8 border border-white shadow-[var(--shadow-saas-lg)]">
+                  
+                  {/* Segmented Control */}
+                  <div className="flex bg-gray-100 p-1.5 rounded-2xl w-max mb-6 sm:mb-8 relative">
+                    <button 
+                      onClick={() => setTripType('one-way')}
+                      className={`relative px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 z-10 ${tripType === 'one-way' ? 'text-black' : 'text-gray-500 hover:text-gray-700'}`}
+                    >
+                      One Way
+                    </button>
+                    <button 
+                      onClick={() => setTripType('round-trip')}
+                      className={`relative px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 z-10 ${tripType === 'round-trip' ? 'text-black' : 'text-gray-500 hover:text-gray-700'}`}
+                    >
+                      Round Trip
+                    </button>
+                    {/* Active Pill Indicator */}
+                    <div 
+                      className={`absolute top-1.5 bottom-1.5 left-1.5 w-[calc(50%-6px)] bg-white rounded-xl shadow-[var(--shadow-saas-sm)] transition-transform duration-300 ease-out z-0 ${tripType === 'round-trip' ? 'translate-x-full' : 'translate-x-0'}`}
+                    />
+                  </div>
+
+                  <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr_auto] gap-4 sm:gap-6 items-end relative">
+                    
+                    <div className="w-full">
+                      <CityAutocomplete value={pickup} onChange={setPickup} placeholder="Pickup Location" />
                     </div>
-                    <div className="text-left sm:text-right mt-1 sm:mt-0">
-                      <div className="text-base sm:text-2xl font-extrabold text-black">
-                        ₹{cab.pricePerKm}<span className="text-[10px] sm:text-sm text-gray-500 font-medium">/km</span>
+
+                    {/* Swap Button Desktop */}
+                    <div className="hidden md:flex items-center justify-center h-12 w-12 z-10 -mx-3">
+                      <button 
+                        type="button" 
+                        onClick={handleSwap}
+                        className="w-10 h-10 rounded-full bg-white border border-gray-200 shadow-[var(--shadow-saas-md)] flex items-center justify-center hover:bg-gray-50 active:scale-95 hover:rotate-180 transition-all duration-300 z-20 relative"
+                      >
+                        <FiArrowRight className="text-black" />
+                      </button>
+                    </div>
+
+                    {/* Swap Button Mobile */}
+                    <div className="md:hidden flex justify-center -my-2 relative z-10">
+                      <button 
+                        type="button" 
+                        onClick={handleSwap}
+                        className="w-8 h-8 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:bg-gray-50 active:scale-95 transition-all duration-300 rotate-90"
+                      >
+                        <FiArrowRight className="text-black text-sm" />
+                      </button>
+                    </div>
+
+                    <div className="w-full">
+                      <CityAutocomplete value={drop} onChange={setDrop} placeholder="Drop Location" isDrop={true} />
+                    </div>
+
+                    <div className="w-full mt-4 md:mt-0 h-full flex items-end">
+                      <button 
+                        type="submit" 
+                        className="w-full px-10 h-[52px] bg-black hover:bg-gray-900 text-white rounded-[14px] font-bold transition-all active:scale-[0.98] flex items-center justify-center gap-2 group shadow-[0_4px_14px_0_rgba(0,0,0,0.2)]"
+                      >
+                        Search <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
+                      </button>
+                    </div>
+                  </form>
+              </div>
+            </motion.div>
+            
+          </div>
+        </section>
+
+        {/* POPULAR ROUTES (Premium Structured) */}
+        <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-white">
+          <div className="text-center mb-20 relative">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gray-50 rounded-full blur-3xl -z-10 opacity-50"></div>
+            <h2 className="text-4xl md:text-5xl font-black text-black tracking-tight mb-4">Popular Routes</h2>
+            <p className="text-lg text-gray-500 font-medium">Most booked intercity routes by our customers</p>
+          </div>
+
+          {loadingRoutes ? (
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
+              {[1, 2, 3].map(i => <RouteSkeleton key={i} />)}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-8">
+              {popularRoutes.map((route) => (
+                <div 
+                  key={route._id} 
+                  className="bg-white rounded-[20px] md:rounded-[24px] overflow-hidden cursor-pointer group p-4 md:p-8 border border-gray-200/60 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] hover:border-black/10 transition-all duration-500 relative flex flex-col min-h-[220px] md:min-h-[280px]"
+                  onClick={() => navigate(`/search?pickup=${route.pickupCity}&drop=${route.destinationCity}&date=${new Date().toISOString().split('T')[0]}&trip=one-way`, { state: { selectedRoute: route } })} 
+                >
+                  {/* Premium subtle gradient top right blob */}
+                  <div className="absolute top-0 right-0 w-24 h-24 md:w-40 md:h-40 bg-gradient-to-bl from-gray-50/80 to-transparent rounded-bl-full z-0 transition-transform duration-700 group-hover:scale-110"></div>
+                  
+                  <div className="relative z-10 flex-grow">
+                    {/* Pickup */}
+                    <div className="flex gap-3 md:gap-5 items-start mb-8 md:mb-12 group/pickup">
+                      <div className="mt-1 relative z-20 bg-white">
+                        <div className="w-4 h-4 md:w-6 md:h-6 rounded-full border-[2px] md:border-[3px] border-black flex items-center justify-center bg-white shadow-sm transition-transform duration-300 group-hover/pickup:scale-110">
+                          <div className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-black"></div>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5 md:mb-1">Pickup From</p>
+                        <p className="font-black text-sm md:text-xl text-black leading-tight tracking-tight">{route.pickupCity}</p>
+                      </div>
+                    </div>
+
+                    {/* Vertical dashed line with moving dot */}
+                    <div className="absolute left-[24px] md:left-[34px] top-[24px] md:top-[34px] bottom-[70px] md:bottom-[100px] w-px border-l border-dashed border-gray-200 z-10">
+                      <div className="w-1.5 h-1.5 bg-gray-300 rounded-full absolute -left-[3px] md:-left-[3.5px] top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 group-hover:bg-black transition-all duration-500 group-hover:animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
+                    </div>
+
+                    {/* Drop */}
+                    <div className="flex gap-3 md:gap-5 items-start mb-4 md:mb-6 group/drop">
+                      <div className="mt-1 relative z-20 bg-white">
+                        <div className="w-4 h-4 md:w-6 md:h-6 rounded-full border-[2px] md:border-[3px] border-black flex items-center justify-center bg-white shadow-sm transition-transform duration-300 group-hover/drop:scale-110">
+                          <div className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-black"></div>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5 md:mb-1">Drop To</p>
+                        <p className="font-black text-sm md:text-xl text-black leading-tight tracking-tight">{route.destinationCity}</p>
                       </div>
                     </div>
                   </div>
-                  
-                  <div className="flex items-center gap-1.5 sm:gap-3 text-gray-700 mb-3 sm:mb-6 font-medium flex-wrap">
-                    <span className="flex items-center gap-1 sm:gap-1.5 bg-gray-100 px-1.5 py-1 sm:px-3 sm:py-1.5 rounded-md sm:rounded-xl text-[10px] sm:text-sm">
-                      <FiUsers className="text-black w-3 h-3 sm:w-4 sm:h-4"/> {cab.seats}
-                    </span>
-                    <span className="flex items-center gap-1 sm:gap-1.5 bg-gray-100 px-1.5 py-1 sm:px-3 sm:py-1.5 rounded-md sm:rounded-xl text-[10px] sm:text-sm">
-                      <FiFilter className="text-black w-3 h-3 sm:w-4 sm:h-4" /> {cab.fuelType || 'Petrol'}
-                    </span>
+
+                  {/* Footer */}
+                  <div className="relative z-10 border-t border-gray-100/80 pt-3 md:pt-5 mt-auto flex flex-col md:flex-row md:justify-between items-start md:items-end gap-2 md:gap-0">
+                    <div>
+                      <p className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5 md:mb-1">Distance</p>
+                      <p className="font-black text-xs md:text-sm text-black tracking-tight">{route.distance} km</p>
+                    </div>
+                    <div className="text-black font-bold text-[10px] md:text-sm flex items-center gap-1 group-hover:gap-2 transition-all duration-300 self-end">
+                      View <FiArrowRight className="text-[12px] md:text-base"/>
+                    </div>
                   </div>
-
-                  <Link 
-                    to={`/cab/${cab._id}`} 
-                    className="mt-auto w-full bg-black hover:bg-neutral-800 text-white py-2 sm:py-3.5 rounded-lg sm:rounded-xl font-bold transition-all flex justify-center items-center gap-1.5 sm:gap-2 text-[11px] sm:text-base"
-                  >
-                    Select <FiArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
-                  </Link>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
+              ))}
+            </div>
+          )}
+        </section>
 
-      {/* Why Choose Us */}
-      <section className="py-8 sm:py-16 bg-gray-50 border-y border-gray-200">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          <div className="text-center mb-6 sm:mb-12">
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-black mb-1 sm:mb-3 tracking-tight">Why Choose Us</h2>
-            <p className="text-xs sm:text-sm text-gray-500 font-medium">Thousands of travelers trust us</p>
-          </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-8">
-            {features.map((feature, idx) => (
-              <div key={idx} className="bg-white p-4 sm:p-8 rounded-xl sm:rounded-2xl border border-gray-200 text-center hover:border-black transition-all duration-300">
-                <div className="inline-flex items-center justify-center w-10 h-10 sm:w-16 sm:h-16 bg-black text-white rounded-lg sm:rounded-2xl mb-3 sm:mb-6">
-                  <feature.icon className="w-5 h-5 sm:w-7 sm:h-7" />
-                </div>
-                <h3 className="text-sm sm:text-xl font-bold text-black mb-1 sm:mb-3 leading-tight">{feature.title}</h3>
-                <p className="text-gray-600 text-[10px] sm:text-sm leading-tight sm:leading-relaxed">{feature.desc}</p>
+        {/* FLEET SECTION (Premium Structured) */}
+        <section className="py-24 bg-white border-t border-gray-100/60 relative overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="text-center mb-20">
+              <h2 className="text-4xl md:text-5xl font-black text-black tracking-tight mb-4">Our Fleet</h2>
+              <p className="text-lg text-gray-500 font-medium">Choose from our wide range of meticulously maintained vehicles</p>
+            </div>
+            
+            {loadingCabs ? (
+              <div className="flex justify-center"><div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin"></div></div>
+            ) : (
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8">
+                {cabs.map((cab) => (
+                  <div key={cab._id} className="bg-white rounded-[16px] md:rounded-[24px] p-2.5 md:p-4 border border-gray-200/60 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] hover:border-black/10 transition-all duration-500 group flex flex-col h-full">
+                    
+                    {/* Premium Studio Image Box */}
+                    <div className="relative w-full h-[120px] md:h-[200px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-50 via-gray-100/50 to-gray-50/50 rounded-xl md:rounded-2xl mb-3 md:mb-6 overflow-hidden flex items-center justify-center border border-gray-100/50">
+                      {/* Glassmorphic AC Badge */}
+                      <div className="absolute top-2 right-2 md:top-3 md:right-3 bg-white/80 backdrop-blur-md rounded-full px-2 py-0.5 md:px-3 md:py-1 shadow-sm text-[8px] md:text-[10px] font-black border border-white/40 z-10 text-black tracking-widest">
+                        {cab.acStatus || 'AC'}
+                      </div>
+                      <img 
+                        src={cab.image || 'https://via.placeholder.com/400x300?text=Cab'} 
+                        alt={cab.name} 
+                        className="w-[90%] h-[90%] object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-700 ease-out"
+                      />
+                    </div>
+                    
+                    {/* Card Content */}
+                    <div className="px-1 md:px-2 flex flex-col flex-grow">
+                      <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-2 gap-1 md:gap-0">
+                        <div>
+                          <h3 className="text-sm md:text-xl font-black text-black tracking-tight leading-tight line-clamp-1">{cab.name}</h3>
+                          <p className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-gray-400 mt-0.5 md:mt-1">{cab.category || 'Sedan'}</p>
+                        </div>
+                        <div className="flex items-baseline md:text-right">
+                          <span className="text-lg md:text-2xl font-black text-black leading-none">₹{cab.pricePerKm}</span>
+                          <span className="text-[8px] md:text-[10px] font-bold text-gray-400 ml-0.5 md:ml-1">/km</span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-1 md:gap-2 mb-3 md:mb-8 mt-auto pt-2 md:pt-4">
+                        <span className="px-1.5 py-1 md:px-3 md:py-1.5 bg-gray-50 rounded md:rounded-lg border border-gray-200/60 text-[9px] md:text-xs font-bold text-gray-600 flex items-center gap-1 md:gap-2 tracking-wide group-hover:bg-white group-hover:border-gray-200 transition-colors">
+                          <FiUsers className="text-gray-400 text-[10px] md:text-sm" /> {cab.seats}
+                        </span>
+                        <span className="px-1.5 py-1 md:px-3 md:py-1.5 bg-gray-50 rounded md:rounded-lg border border-gray-200/60 text-[9px] md:text-xs font-bold text-gray-600 flex items-center gap-1 md:gap-2 tracking-wide group-hover:bg-white group-hover:border-gray-200 transition-colors">
+                          <FiFilter className="text-gray-400 text-[10px] md:text-sm" /> {cab.fuelType || 'Petrol'}
+                        </span>
+                      </div>
+                      
+                      <button className="w-full bg-black text-white rounded-[10px] md:rounded-[14px] py-2 md:py-4 text-[10px] md:text-sm font-black flex justify-center items-center gap-1 md:gap-2 hover:bg-gray-900 active:scale-[0.98] transition-all duration-300 group/btn shadow-[0_4px_14px_0_rgba(0,0,0,0.2)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.23)]">
+                        Select <FiArrowRight className="text-[12px] md:text-base group-hover/btn:translate-x-1 transition-transform duration-300" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Testimonials */}
-      <section className="py-12 sm:py-24 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-        <div className="text-center mb-6 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-black tracking-tight">What Our Riders Say</h2>
-        </div>
-        
-        {loadingTestimonials ? (
-          <div className="flex justify-center py-8 sm:py-12">
-            <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-t-4 border-b-4 border-black"></div>
-          </div>
-        ) : testimonials.length === 0 ? (
-          <div className="text-center py-8 sm:py-12 bg-white rounded-xl sm:rounded-2xl border border-gray-200 max-w-md mx-auto">
-            <p className="text-xs sm:text-sm text-gray-500 font-medium">No testimonials yet. Be the first to share your experience!</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8">
-            {testimonials.map((testimonial) => (
-              <div key={testimonial._id} className="bg-white p-5 sm:p-8 rounded-xl sm:rounded-2xl border border-gray-200 hover:border-black transition-all duration-300 flex flex-col h-full">
-                <div className="flex gap-1 sm:gap-1.5 text-black mb-3 sm:mb-6 text-xs sm:text-base">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <FaStar key={i} />
-                  ))}
+        {/* FEATURES (Clean Light Grid) */}
+        <section className="py-24 bg-white border-t border-gray-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-left mb-16 max-w-2xl">
+              <h2 className="text-4xl md:text-5xl font-extrabold text-black tracking-tight mb-4">Why ride with us.</h2>
+              <p className="text-xl text-gray-500 font-medium">Uncompromising quality at every turn.</p>
+            </div>
+            
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+              
+              <div className="bg-gray-50 rounded-[20px] md:rounded-[32px] p-4 md:p-8 border border-gray-100 hover:bg-white hover:shadow-[var(--shadow-saas-md)] hover:border-gray-200 transition-all duration-300">
+                <div className="w-10 h-10 md:w-14 md:h-14 bg-white rounded-xl md:rounded-2xl flex items-center justify-center shadow-sm mb-3 md:mb-6 border border-gray-100">
+                  <FiShield className="text-lg md:text-xl text-black" />
                 </div>
-                <p className="text-gray-600 mb-4 sm:mb-8 italic leading-relaxed text-xs sm:text-base flex-grow">
-                  "{testimonial.review}"
-                </p>
-                <h4 className="font-bold text-black text-sm sm:text-base">{testimonial.name}</h4>
+                <h3 className="text-sm md:text-xl font-black text-black tracking-tight mb-1.5 md:mb-3">Verified Drivers</h3>
+                <p className="text-[10px] md:text-sm text-gray-500 font-medium leading-snug">Strict background checks ensure your safety is our highest priority.</p>
               </div>
-            ))}
+
+              <div className="bg-gray-50 rounded-[20px] md:rounded-[32px] p-4 md:p-8 border border-gray-100 hover:bg-white hover:shadow-[var(--shadow-saas-md)] hover:border-gray-200 transition-all duration-300">
+                <div className="w-10 h-10 md:w-14 md:h-14 bg-white rounded-xl md:rounded-2xl flex items-center justify-center shadow-sm mb-3 md:mb-6 border border-gray-100">
+                  <FiDollarSign className="text-lg md:text-xl text-black" />
+                </div>
+                <h3 className="text-sm md:text-xl font-black text-black tracking-tight mb-1.5 md:mb-3">Transparent Pricing</h3>
+                <p className="text-[10px] md:text-sm text-gray-500 font-medium leading-snug">No hidden charges. What you see is exactly what you pay.</p>
+              </div>
+
+              <div className="bg-gray-50 rounded-[20px] md:rounded-[32px] p-4 md:p-8 border border-gray-100 hover:bg-white hover:shadow-[var(--shadow-saas-md)] hover:border-gray-200 transition-all duration-300">
+                <div className="w-10 h-10 md:w-14 md:h-14 bg-white rounded-xl md:rounded-2xl flex items-center justify-center shadow-sm mb-3 md:mb-6 border border-gray-100">
+                  <FiClock className="text-lg md:text-xl text-black" />
+                </div>
+                <h3 className="text-sm md:text-xl font-black text-black tracking-tight mb-1.5 md:mb-3">On-Time Guarantee</h3>
+                <p className="text-[10px] md:text-sm text-gray-500 font-medium leading-snug">Punctual pickups and efficient routing ensure you never wait.</p>
+              </div>
+
+              <div className="bg-gray-50 rounded-[20px] md:rounded-[32px] p-4 md:p-8 border border-gray-100 hover:bg-white hover:shadow-[var(--shadow-saas-md)] hover:border-gray-200 transition-all duration-300">
+                <div className="w-10 h-10 md:w-14 md:h-14 bg-white rounded-xl md:rounded-2xl flex items-center justify-center shadow-sm mb-3 md:mb-6 border border-gray-100">
+                  <FiStar className="text-lg md:text-xl text-black" />
+                </div>
+                <h3 className="text-sm md:text-xl font-black text-black tracking-tight mb-1.5 md:mb-3">Premium Fleet</h3>
+                <p className="text-[10px] md:text-sm text-gray-500 font-medium leading-snug">Travel in comfort with our meticulously maintained, clean cars.</p>
+              </div>
+
+            </div>
           </div>
-        )}
-      </section>
-    </div>
+        </section>
+
+      </div>
+    </PageTransition>
   );
 };
 
