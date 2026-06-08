@@ -49,7 +49,18 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans pb-24">
-      <SEOHead title="Contact Us" description="Get in touch with CabBook support team." url="/contact" />
+      <SEOHead 
+        title="Contact Us - RK Tours & Travels Customer Support" 
+        description="Get in touch with RK Tours & Travels support team. We are available 24/7 to help you with your cab bookings and queries." 
+        url="/contact" 
+        keywords="contact rk tours and travels, cab booking support, taxi customer care, hire a cab phone number"
+        schemaMarkup={{
+          "@context": "https://schema.org",
+          "@type": "ContactPage",
+          "name": "Contact RK Tours & Travels",
+          "description": "Get in touch for your travel needs."
+        }}
+      />
       
       {/* Header Section */}
       <section className="bg-black pt-32 pb-32 px-4 text-center">

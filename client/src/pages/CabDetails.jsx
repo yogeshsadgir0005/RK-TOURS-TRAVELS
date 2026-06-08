@@ -45,7 +45,25 @@ const CabDetails = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pt-28 pb-16 font-sans">
-      <SEOHead title={`${cab.name} | CabBook`} />
+      <SEOHead 
+        title={`${cab.name} Cab Booking - Best Fares | RK Tours & Travels`} 
+        description={`Book a ${cab.name} (${cab.category}) with RK Tours & Travels. Enjoy a comfortable ride with verified drivers at just ₹${cab.pricePerKm}/km.`}
+        url={`/cab/${cab._id}`}
+        keywords={`book ${cab.name}, ${cab.category} cab booking, hire ${cab.name} taxi, affordable ${cab.category} cabs`}
+        schemaMarkup={{
+          "@context": "https://schema.org",
+          "@type": "Product",
+          "name": cab.name,
+          "image": cab.image,
+          "description": `Book a ${cab.category} cab - ${cab.name}.`,
+          "offers": {
+            "@type": "Offer",
+            "priceCurrency": "INR",
+            "price": cab.pricePerKm,
+            "availability": "https://schema.org/InStock"
+          }
+        }}
+      />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <button onClick={() => navigate(-1)} className="text-black font-bold hover:underline mb-6 inline-block transition-all">
           ← Back

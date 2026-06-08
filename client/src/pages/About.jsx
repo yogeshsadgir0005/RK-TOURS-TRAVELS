@@ -5,9 +5,16 @@ const About = () => {
   return (
     <div className="min-h-screen bg-white font-sans">
       <SEOHead 
-        title="About Us" 
-        description="Learn more about CabBook, India's leading intercity cab booking service." 
+        title="About Us - RK Tours & Travels | Best Taxi Service" 
+        description="Learn more about RK Tours & Travels. We are committed to providing safe, reliable, and affordable cab booking services across India." 
         url="/about" 
+        keywords="about rk tours and travels, cab service company, trusted taxi service, reliable cab booking"
+        schemaMarkup={{
+          "@context": "https://schema.org",
+          "@type": "AboutPage",
+          "name": "About RK Tours & Travels",
+          "description": "Learn more about our reliable cab services."
+        }}
       />
       
       {/* Hero Section */}

@@ -42,7 +42,22 @@ const RoutePage = () => {
           schemaMarkup={seoData.schemaMarkup}
         />
       ) : (
-        <SEOHead title={`Cabs from ${pickup} to ${drop}`} description={`Book cheap cabs from ${pickup} to ${drop}`} url={`/cabs/${routeSlug}`} />
+        <SEOHead 
+          title={`Cab from ${pickup} to ${drop} - Best One Way Taxi Fares | RK Tours & Travels`} 
+          description={`Book cheap and reliable cabs from ${pickup} to ${drop}. Experienced drivers, clean cars, and timely service. 24/7 customer support.`} 
+          url={`/cabs/${routeSlug}`} 
+          keywords={`cab from ${pickup} to ${drop}, taxi ${pickup} to ${drop}, ${pickup} to ${drop} one way cab, ${pickup} to ${drop} taxi fare`}
+          schemaMarkup={{
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": `Cab Ride: ${pickup} to ${drop}`,
+            "description": `One-way or round-trip cab service from ${pickup} to ${drop}.`,
+            "brand": {
+              "@type": "Brand",
+              "name": "RK Tours & Travels"
+            }
+          }}
+        />
       )}
 
       <div className="pt-24 pb-12 bg-blue-900 text-white text-center px-4">

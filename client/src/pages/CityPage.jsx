@@ -32,7 +32,23 @@ const CityPage = () => {
       {seoData ? (
         <SEOHead title={seoData.title} description={seoData.metaDescription} url={`/city/${citySlug}`} keywords={seoData.keywords} />
       ) : (
-        <SEOHead title={`Cabs in ${cityName}`} description={`Book the best cabs in ${cityName}`} url={`/city/${citySlug}`} />
+        <SEOHead 
+          title={`Cabs in ${cityName} - Top Rated Taxi Service | RK Tours & Travels`} 
+          description={`Book the best and most affordable cabs in ${cityName}. Reliable local and outstation taxi service with verified drivers.`} 
+          url={`/city/${citySlug}`} 
+          keywords={`cabs in ${cityName}, ${cityName} taxi service, book cab ${cityName}, outstation cabs ${cityName}, car rental ${cityName}`}
+          schemaMarkup={{
+            "@context": "https://schema.org",
+            "@type": "LocalBusiness",
+            "name": `RK Tours & Travels - ${cityName}`,
+            "description": `Reliable taxi service in ${cityName}. Book local and outstation cabs instantly.`,
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": cityName,
+              "addressCountry": "IN"
+            }
+          }}
+        />
       )}
 
       <div className="pt-24 pb-12 bg-blue-900 text-white text-center px-4">

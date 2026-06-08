@@ -236,7 +236,11 @@ ${fareMessage}`;
 
   return (
     <div className="min-h-screen bg-gray-50 pb-10 sm:pb-16 pt-20 sm:pt-28 font-sans">
-      <SEOHead title="Confirm Booking | CabBook" />
+      <SEOHead 
+        title="Confirm Your Cab Booking | RK Tours & Travels" 
+        description="Securely confirm your cab booking with RK Tours & Travels. Fast, easy, and transparent taxi booking process."
+        url="/book"
+      />
       <div className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8">
         
         <div className="mb-6 sm:mb-8">

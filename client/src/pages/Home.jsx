@@ -73,7 +73,27 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-white font-sans pb-8 sm:pb-12">
-      <SEOHead title="Reliable Intercity Cabs" description="Book affordable one-way and round-trip cabs instantly." url="/" />
+      <SEOHead 
+        title="Reliable Intercity Cabs & Taxi Service" 
+        description="Book affordable one-way and round-trip cabs instantly. Top-rated cab booking website offering reliable taxi service across India." 
+        url="/" 
+        keywords="cab booking website, taxi service, book a cab online, intercity cabs, one way taxi, round trip cabs"
+        schemaMarkup={{
+          "@context": "https://schema.org",
+          "@type": "TravelAgency",
+          "name": "RK Tours & Travels",
+          "url": "https://rk-tours-travels.vercel.app",
+          "logo": "https://rk-tours-travels.vercel.app/favicon.svg",
+          "description": "Top-rated cab booking website offering reliable and affordable taxi service across India.",
+          "telephone": "+91-9999999999",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Pune",
+            "addressRegion": "Maharashtra",
+            "addressCountry": "IN"
+          }
+        }}
+      />
       
       {/* HERO SECTION */}
       <section className="bg-black pt-24 pb-16 px-3 sm:pt-32 sm:pb-40 sm:px-4 relative overflow-hidden min-h-[70vh] sm:min-h-[85vh] flex flex-col justify-center">
