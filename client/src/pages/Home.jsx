@@ -79,8 +79,8 @@ const Home = () => {
     const fetchHomeData = async () => {
       try {
         const [routesRes, cabsRes, testimonialsRes, contentRes] = await Promise.all([
-          axiosInstance.get('/routes'),
-          axiosInstance.get('/cabs'),
+          axiosInstance.get('/routes?limit=6'),
+          axiosInstance.get('/cabs?limit=4'),
           axiosInstance.get('/content/testimonials'),
           axiosInstance.get('/content')
         ]);
