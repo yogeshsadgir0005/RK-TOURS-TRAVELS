@@ -5,7 +5,7 @@ const Privacy = () => {
   return (
     <PageTransition>
       <SEOHead title="Privacy Policy | RK Tours" />
-      <div className="min-h-screen bg-bg-secondary pt-32 pb-24 px-4 sm:px-8 font-sans">
+      <div className="min-h-screen bg-bg-secondary pt-20 pb-24 px-4 sm:px-8 font-sans">
         
         <div className="max-w-[65ch] mx-auto bg-white p-8 sm:p-12 rounded-[32px] border border-gray-100 shadow-saas-sm">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-black tracking-tight mb-2">Privacy Policy</h1>

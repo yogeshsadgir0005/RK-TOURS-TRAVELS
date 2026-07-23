@@ -27,10 +27,14 @@ const BookingForm = () => {
     // Fetch active cabs & admin settings
     const fetchData = async () => {
       try {
-        const cabRes = await axiosInstance.get('/cabs');
-        setCabs(cabRes.data);
-        const contentRes = await axiosInstance.get('/content/admin_whatsapp_number');
-        if(contentRes.data) setAdminPhone(contentRes.data.value);
+        const cachedCabs = sessionStorage.getItem('cabsData');
+        if (cachedCabs) {
+          setCabs(JSON.parse(cachedCabs));
+        } else {
+          const cabRes = await axiosInstance.get('/cabs');
+          setCabs(cabRes.data);
+          sessionStorage.setItem('cabsData', JSON.stringify(cabRes.data));
+        }
       } catch (err) { console.error("Failed to load initial data"); }
     };
     fetchData();
@@ -38,10 +42,6 @@ const BookingForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!user) {
-      // Redirect to login, but save intent
-      return navigate('/login', { state: { from: location.pathname } });
-    }
 
     try {
       const selectedCab = cabs.find(c => c._id === formData.cabTypeId);
@@ -55,16 +55,14 @@ const BookingForm = () => {
         passengerDetails: { name: formData.passengerName, phone: formData.passengerPhone }
       };
 
-      // 1. Create Pending Booking in DB
-      await axiosInstance.post('/bookings', payload);
-
-      // 2. Generate WA Link
+      // 1. Generate WA Link directly without DB saving for maximum simplicity
       const waDetails = { ...payload, cabTypeName: selectedCab?.name || 'Standard' };
       const waLink = generateWhatsAppLink(adminPhone, waDetails);
 
-      // 3. Open WA and redirect
+      // 2. Open WA
       window.open(waLink, '_blank');
-      navigate('/my-bookings');
+
+      // Optional: Reset form or show success message if needed, but opening WA is usually enough feedback.
 
     } catch (error) {
       alert("Booking failed. Please try again.");
@@ -167,7 +165,7 @@ const BookingForm = () => {
           <button type="submit" 
             className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-8 rounded-xl transition-all shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 hover:-translate-y-0.5">
             <FiSearch className="text-xl" />
-            {user ? 'Book Now' : 'Login to Book'}
+            Book on WhatsApp
           </button>
         </div>
         

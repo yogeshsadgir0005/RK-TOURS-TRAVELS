@@ -33,7 +33,7 @@ const Profile = () => {
   return (
     <PageTransition>
       <SEOHead title="Profile | RK Tours" />
-      <div className="min-h-screen bg-bg-secondary pt-32 px-4 sm:px-8 pb-12 font-sans">
+      <div className="min-h-screen bg-bg-secondary pt-20 px-4 sm:px-8 pb-12 font-sans">
         
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-12">
           

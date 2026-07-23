@@ -11,9 +11,7 @@ const Footer = () => {
   const mapIframe = contentData?.mapIframe || "";
 
   return (
-    <footer className="bg-black text-white relative overflow-hidden pt-32 pb-16">
-      {/* SaaS Glowing Aurora Background */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[400px] bg-gradient-to-b from-white/10 to-transparent blur-[120px] rounded-full pointer-events-none opacity-50"></div>
+    <footer className="bg-neutral-900 text-white relative overflow-hidden pt-16 pb-12">
       
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         
@@ -24,18 +22,15 @@ const Footer = () => {
           <div className="col-span-2 lg:col-span-2 pr-0 lg:pr-8">
             <Link to="/" className="flex items-center gap-2 mb-6 group inline-flex">
               {logoUrl ? (
-                <img src={logoUrl} alt={siteName} className="h-10 w-auto object-contain rounded-[10px] transition-transform duration-300 group-hover:scale-105" />
+                <img src={logoUrl} alt={siteName} className="h-14 w-auto object-contain rounded-[10px] transition-transform duration-300 group-hover:scale-105" />
               ) : (
                 <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-black font-black text-2xl shadow-[var(--shadow-saas-inner)] group-hover:scale-105 transition-transform duration-300">
                   {siteName?.charAt(0) || 'R'}
                 </div>
               )}
-              <span className="font-extrabold text-2xl tracking-tighter text-white">
-                {siteName}
-              </span>
             </Link>
             <p className="text-gray-400 text-sm font-medium leading-relaxed max-w-sm">
-              The premier SaaS platform for booking outstation cabs and intercity travel across India. Fast, reliable, and absolutely uncompromising on quality.
+              Your trusted partner for outstation cab bookings across Maharashtra. Reliable drivers, clean cars, and transparent pricing on every trip.
             </p>
           </div>
 
@@ -113,7 +108,7 @@ const Footer = () => {
             © {new Date().getFullYear()} {siteName}. All rights reserved.
           </p>
           <div className="flex gap-4">
-            <span className="text-gray-500 text-sm">Powered by SaaS Architecture</span>
+            <span className="text-gray-500 text-sm">Designed for reliability</span>
           </div>
         </div>
       </div>

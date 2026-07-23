@@ -1,58 +1,33 @@
-import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import axiosInstance from '../utils/axiosInstance';
 import SEOHead from '../components/SEOHead';
 import BookingForm from '../components/BookingForm';
 
 const CityPage = () => {
   const { citySlug } = useParams();
-  const [seoData, setSeoData] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchCityData = async () => {
-      try {
-        const res = await axiosInstance.get(`/seo/page?url=/city/${citySlug}`);
-        setSeoData(res.data);
-      } catch (error) {
-        console.error("City SEO not found");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCityData();
-  }, [citySlug]);
-
   const cityName = citySlug.charAt(0).toUpperCase() + citySlug.slice(1);
-
-  if (loading) return <div className="pt-32 text-center">Loading city data...</div>;
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      {seoData ? (
-        <SEOHead title={seoData.title} description={seoData.metaDescription} url={`/city/${citySlug}`} keywords={seoData.keywords} />
-      ) : (
-        <SEOHead 
-          title={`Cabs in ${cityName} - Top Rated Taxi Service | RK Tours & Travels`} 
-          description={`Book the best and most affordable cabs in ${cityName}. Reliable local and outstation taxi service with verified drivers.`} 
-          url={`/city/${citySlug}`} 
-          keywords={`cabs in ${cityName}, ${cityName} taxi service, book cab ${cityName}, outstation cabs ${cityName}, car rental ${cityName}`}
-          schemaMarkup={{
-            "@context": "https://schema.org",
-            "@type": "LocalBusiness",
-            "name": `RK Tours & Travels - ${cityName}`,
-            "description": `Reliable taxi service in ${cityName}. Book local and outstation cabs instantly.`,
-            "address": {
-              "@type": "PostalAddress",
-              "addressLocality": cityName,
-              "addressCountry": "IN"
-            }
-          }}
-        />
-      )}
+      <SEOHead 
+        title={`Cabs in ${cityName} - Top Rated Taxi Service | RK Tours & Travels`} 
+        description={`Book the best and most affordable cabs in ${cityName}. Reliable local and outstation taxi service with verified drivers.`} 
+        url={`/city/${citySlug}`} 
+        keywords={`cabs in ${cityName}, ${cityName} taxi service, book cab ${cityName}, outstation cabs ${cityName}, car rental ${cityName}`}
+        schemaMarkup={{
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "name": `RK Tours & Travels - ${cityName}`,
+          "description": `Reliable taxi service in ${cityName}. Book local and outstation cabs instantly.`,
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": cityName,
+            "addressCountry": "IN"
+          }
+        }}
+      />
 
       <div className="pt-24 pb-12 bg-blue-900 text-white text-center px-4">
-        <h1 className="text-4xl font-bold">{seoData?.h1Tag || `Cab Services in ${cityName}`}</h1>
+        <h1 className="text-4xl font-bold">{`Cab Services in ${cityName}`}</h1>
         <p className="mt-4 text-xl text-blue-200">Explore outstation and local cabs.</p>
       </div>
 

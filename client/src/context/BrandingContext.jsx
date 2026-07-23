@@ -6,26 +6,14 @@ const BrandingContext = createContext();
 export const useBranding = () => useContext(BrandingContext);
 
 export const BrandingProvider = ({ children }) => {
-  const [logoUrl, setLogoUrl] = useState('');
-  const [siteName, setSiteName] = useState('RK Tours & Travels');
-  const [contentData, setContentData] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchBranding = async () => {
-      try {
-        const res = await axiosInstance.get('/content');
-        if (res.data.logoUrl) setLogoUrl(res.data.logoUrl);
-        if (res.data.siteName) setSiteName(res.data.siteName);
-        setContentData(res.data);
-      } catch (err) {
-        console.error("Branding fetch failed", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchBranding();
-  }, []);
+  const [logoUrl, setLogoUrl] = useState('/RK1.png');
+  const [siteName, setSiteName] = useState('RK TOURS & TRAVELS');
+  const [contentData, setContentData] = useState({
+    contactAddress: "Pune, Maharashtra\nIndia 411001",
+    contactPhone: "+91 99999 99999",
+    contactEmail: "support@rktours.com"
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
     <BrandingContext.Provider value={{ logoUrl, siteName, contentData, isLoading }}>

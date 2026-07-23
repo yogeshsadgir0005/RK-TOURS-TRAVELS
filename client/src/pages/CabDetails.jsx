@@ -36,12 +36,12 @@ const CabDetails = () => {
   };
 
   if (loading) return (
-    <div className="min-h-screen pt-32 flex justify-center items-start">
+    <div className="min-h-screen pt-20 flex justify-center items-start">
       <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-b-4 border-black"></div>
     </div>
   );
 
-  if (!cab) return <div className="pt-32 text-center">Cab not found</div>;
+  if (!cab) return <div className="pt-20 text-center">Cab not found</div>;
 
   return (
     <div className="min-h-screen bg-gray-50 pt-28 pb-16 font-sans">

@@ -6,6 +6,7 @@ import { FiUser, FiPhone, FiMapPin, FiCheckCircle, FiShield, FiArrowRight } from
 import { AuthContext } from '../context/AuthContext';
 import { GoogleMap, Marker, useJsApiLoader, Polyline } from '@react-google-maps/api';
 import PageTransition from '../components/PageTransition';
+import { getDeviceId } from '../utils/getDeviceId';
 
 import citiesData from '../data/cities.json'; 
 
@@ -148,11 +149,6 @@ const BookingPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!user) {
-      toast.error('Please log in to book a cab.');
-      navigate('/login', { state: { from: location.pathname, state: location.state } });
-      return;
-    }
 
     if (!pickupStreet || !dropStreet || !passengerPhone || !passengerName) {
         toast.error('Please fill all required fields');
@@ -162,18 +158,20 @@ const BookingPage = () => {
     setIsSubmitting(true);
 
     const bookingData = {
-      cabId: cab._id,
-      pickupLocation: { address: `${pickupStreet}, ${pickupCity}, ${pickupState}`, coordinates: [pickupCoords?.lng || 0, pickupCoords?.lat || 0] },
-      dropoffLocation: { address: `${dropStreet}, ${dropCity}, ${dropState}`, coordinates: [dropCoords?.lng || 0, dropCoords?.lat || 0] },
-      date: journey.date,
-      tripType: journey.tripType,
+      cabType: cab._id,
+      pickup: { streetAddress: pickupStreet, city: pickupCity, state: pickupState },
+      destination: { streetAddress: dropStreet, city: dropCity, state: dropState },
+      journeyDate: journey.date,
+      tripType: journey.tripType === 'round-trip' ? 'Round Trip' : 'One Way',
       totalFare: grandTotal,
-      passengerDetails: { name: passengerName, phone: passengerPhone }
+      passengerDetails: { name: passengerName, phone: passengerPhone },
+      deviceId: getDeviceId()
     };
 
     try {
-      await axiosInstance.post('/bookings', bookingData);
+      const res = await axiosInstance.post('/bookings', bookingData);
       toast.success('Booking Confirmed Successfully!', { duration: 5000 });
+      if (res.data.whatsappLink) window.open(res.data.whatsappLink, '_blank');
       navigate('/my-bookings');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to confirm booking');
@@ -194,7 +192,7 @@ const BookingPage = () => {
 
   return (
     <PageTransition>
-      <div className="min-h-screen bg-bg-secondary pb-24 pt-32 px-4 sm:px-8 font-sans">
+      <div className="min-h-screen bg-bg-secondary pb-24 pt-20 px-4 sm:px-8 font-sans">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-12 lg:items-start">
           
           {/* LEFT: THE FORM */}

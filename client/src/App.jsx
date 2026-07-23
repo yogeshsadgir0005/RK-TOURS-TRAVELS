@@ -58,11 +58,7 @@ function App() {
               <Route path="/cabs/:routeSlug" element={<RoutePage />} />
               <Route path="/book" element={<BookingPage />} />
               
-              <Route path="/my-bookings" element={
-                <ProtectedRoute>
-                  <MyBookings />
-                </ProtectedRoute>
-              } />
+              <Route path="/my-bookings" element={<MyBookings />} />
               <Route path="/profile" element={
                 <ProtectedRoute>
                   <Profile />

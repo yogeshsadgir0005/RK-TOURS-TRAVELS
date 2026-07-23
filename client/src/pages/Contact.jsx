@@ -26,7 +26,7 @@ const Contact = () => {
   return (
     <PageTransition>
       <SEOHead title="Contact Us | RK Tours" />
-      <div className="min-h-screen bg-bg-secondary pt-32 pb-24 px-4 sm:px-8 font-sans">
+      <div className="min-h-screen bg-bg-secondary pt-20 pb-24 px-4 sm:px-8 font-sans">
         
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16">
           

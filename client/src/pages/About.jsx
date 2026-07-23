@@ -6,7 +6,7 @@ const About = () => {
   return (
     <PageTransition>
       <SEOHead title="About Us | RK Tours" />
-      <div className="min-h-screen bg-bg-secondary pt-32 pb-24 px-4 sm:px-8 font-sans">
+      <div className="min-h-screen bg-bg-secondary pt-20 pb-24 px-4 sm:px-8 font-sans">
         
         <div className="max-w-[65ch] mx-auto">
           <h1 className="text-4xl sm:text-5xl font-extrabold text-black tracking-tight mb-8">About RK Tours</h1>

@@ -4,11 +4,11 @@ import { generateWhatsAppLink } from '../utils/generateWhatsAppLink.js';
 
 export const createBooking = async (req, res, next) => {
   try {
-    const booking = new Booking({ ...req.body, user: req.user._id });
+    const booking = new Booking({ ...req.body });
     const savedBooking = await booking.save();
     
     const adminNumDoc = await WebsiteContent.findOne({ key: 'admin_whatsapp_number' });
-    const adminPhone = adminNumDoc ? adminNumDoc.value : '910000000000';
+    const adminPhone = adminNumDoc ? adminNumDoc.value : '918087959271';
     
     const waLink = generateWhatsAppLink(adminPhone, await savedBooking.populate('cabType'));
     res.status(201).json({ booking: savedBooking, whatsappLink: waLink });
@@ -17,7 +17,14 @@ export const createBooking = async (req, res, next) => {
 
 export const getMyBookings = async (req, res, next) => {
   try {
-    const bookings = await Booking.find({ user: req.user._id }).populate('cabType').sort('-createdAt');
+    const { deviceId, phone } = req.query;
+    if (!deviceId && !phone) return res.status(400).json({ message: "Device ID or Phone required" });
+    
+    const query = {};
+    if (phone) query['passengerDetails.phone'] = phone;
+    else if (deviceId) query.deviceId = deviceId;
+
+    const bookings = await Booking.find(query).populate('cabType').sort('-createdAt');
     res.json(bookings);
   } catch (error) { next(error); }
 };

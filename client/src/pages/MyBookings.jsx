@@ -7,6 +7,7 @@ import SEOHead from '../components/SEOHead';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useModal } from '../context/ModalContext';
+import { getDeviceId } from '../utils/getDeviceId';
 
 const BookingAccordion = ({ booking, onCancel }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -130,16 +131,36 @@ const BookingAccordion = ({ booking, onCancel }) => {
 const MyBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [phoneInput, setPhoneInput] = useState('');
+  const [searchMethod, setSearchMethod] = useState('device'); // 'device' or 'phone'
   const { showConfirm } = useModal();
 
   useEffect(() => {
-    fetchBookings();
+    fetchBookingsByDevice();
   }, []);
 
-  const fetchBookings = async () => {
+  const fetchBookingsByDevice = async () => {
+    setLoading(true);
+    setSearchMethod('device');
     try {
-      const res = await axiosInstance.get('/bookings/mybookings');
+      const res = await axiosInstance.get(`/bookings/mybookings?deviceId=${getDeviceId()}`);
       setBookings(res.data);
+    } catch (error) {
+      toast.error('Failed to load bookings');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchBookingsByPhone = async (e) => {
+    e.preventDefault();
+    if (!phoneInput) return;
+    setLoading(true);
+    setSearchMethod('phone');
+    try {
+      const res = await axiosInstance.get(`/bookings/mybookings?phone=${phoneInput}`);
+      setBookings(res.data);
+      if (res.data.length === 0) toast.error('No bookings found for this number');
     } catch (error) {
       toast.error('Failed to load bookings');
     } finally {
@@ -161,7 +182,11 @@ const MyBookings = () => {
     try {
       await axiosInstance.put(`/bookings/${bookingId}/status`, { status: 'Cancelled' });
       toast.success('Booking cancelled successfully');
-      fetchBookings();
+      if (searchMethod === 'phone') {
+        fetchBookingsByPhone({ preventDefault: () => {} });
+      } else {
+        fetchBookingsByDevice();
+      }
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to cancel booking');
     }
@@ -170,17 +195,13 @@ const MyBookings = () => {
   return (
     <PageTransition>
       <SEOHead title="My Bookings | RK Tours" />
-      <div className="min-h-screen bg-bg-secondary pt-32 px-4 sm:px-8 pb-12 font-sans relative">
+      <div className="min-h-screen bg-bg-secondary pt-20 px-4 sm:px-8 pb-12 font-sans relative">
         
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-12">
           
           {/* SAAS SIDEBAR */}
           <div className="hidden lg:block">
             <div className="sticky top-32 flex flex-col gap-2">
-              <Link to="/profile" className="px-4 py-3 rounded-xl text-sm font-bold flex items-center gap-3 transition-colors text-gray-500 hover:bg-gray-100 hover:text-black">
-                <FiUser className="text-lg" />
-                Account Details
-              </Link>
               <Link to="/my-bookings" className="px-4 py-3 rounded-xl text-sm font-bold flex items-center gap-3 transition-colors bg-white shadow-saas-sm text-black border border-gray-100">
                 <FiBookOpen className="text-lg" />
                 My Bookings
@@ -201,26 +222,42 @@ const MyBookings = () => {
                   <div key={i} className="bg-white rounded-2xl h-24 animate-pulse border border-gray-100"></div>
                 ))}
               </div>
-            ) : bookings.length === 0 ? (
-              <div className="bg-white p-12 rounded-[32px] border border-gray-100 shadow-saas-sm text-center">
+            ) : bookings.length === 0 && searchMethod === 'device' ? (
+              <div className="bg-white p-8 sm:p-12 rounded-[32px] border border-gray-100 shadow-saas-sm text-center max-w-md mx-auto">
                 <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-100">
                   <FiCalendar className="text-2xl text-gray-400" />
                 </div>
-                <h3 className="text-xl font-bold text-black tracking-tight mb-2">No bookings found</h3>
-                <p className="text-gray-500 font-medium mb-6">You haven't made any bookings yet.</p>
-                <Link to="/" className="inline-flex h-12 items-center justify-center px-6 bg-black text-white rounded-xl font-bold text-sm shadow-saas-glow hover:bg-neutral-800 transition-colors">
-                  Book a ride
-                </Link>
+                <h3 className="text-xl font-bold text-black tracking-tight mb-2">No active bookings</h3>
+                <p className="text-gray-500 font-medium mb-6">We couldn't find any recent bookings on this device.</p>
+                <div className="border-t border-gray-100 pt-6 mt-2">
+                   <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Booked on another device?</p>
+                   <form onSubmit={fetchBookingsByPhone} className="flex flex-col gap-3">
+                     <input type="tel" placeholder="Enter your 10-digit mobile number" value={phoneInput} onChange={e => setPhoneInput(e.target.value)} required className="w-full h-12 px-4 bg-gray-50/50 border border-gray-200 rounded-xl text-sm font-semibold text-black focus:border-black focus:bg-white shadow-saas-inner outline-none transition-colors" />
+                     <button type="submit" className="w-full h-12 bg-black text-white rounded-xl font-bold text-sm shadow-saas-glow hover:bg-neutral-800 transition-colors">
+                       Track Bookings
+                     </button>
+                   </form>
+                </div>
               </div>
             ) : (
               <div>
-                {bookings.map(booking => (
-                  <BookingAccordion 
-                    key={booking._id} 
-                    booking={booking} 
-                    onCancel={handleCancelBooking} 
-                  />
-                ))}
+                {searchMethod === 'phone' && (
+                  <div className="mb-6 flex justify-between items-center bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                     <span className="text-sm font-medium text-gray-600">Showing bookings for <strong className="text-black">{phoneInput}</strong></span>
+                     <button onClick={() => { setPhoneInput(''); fetchBookingsByDevice(); }} className="text-xs font-bold text-blue-600 hover:underline">Clear</button>
+                  </div>
+                )}
+                {bookings.length === 0 && searchMethod === 'phone' ? (
+                   <div className="text-center py-12 text-gray-500">No bookings found for this number.</div>
+                ) : (
+                  bookings.map(booking => (
+                    <BookingAccordion 
+                      key={booking._id} 
+                      booking={booking} 
+                      onCancel={handleCancelBooking} 
+                    />
+                  ))
+                )}
               </div>
             )}
           </div>
