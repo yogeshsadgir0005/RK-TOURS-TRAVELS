@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useBranding } from '../context/BrandingContext';
 import { FiPhone } from 'react-icons/fi';
@@ -5,11 +6,24 @@ import { FiPhone } from 'react-icons/fi';
 const Navbar = () => {
   const { logoUrl, siteName } = useBranding();
   const location = useLocation();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const isActive = (path) => location.pathname === path;
 
+  // For homepage, start glassmorphic and turn solid on scroll. For other pages, always solid dark to prevent white background bleeding behind glass.
+  const isHome = location.pathname === '/';
+  const navBgClass = (isHome && !scrolled) 
+    ? 'bg-black/40 backdrop-blur-xl border-b border-white/10' 
+    : 'bg-neutral-900 border-b border-transparent shadow-lg';
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-neutral-900/95 backdrop-blur-md border-b border-white/5">
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${navBgClass}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           
@@ -28,12 +42,12 @@ const Navbar = () => {
             <Link to="/about" className={`text-[13px] font-medium transition-colors ${isActive('/about') ? 'text-white' : 'text-gray-400 hover:text-white'}`}>About</Link>
             <Link to="/contact" className={`text-[13px] font-medium transition-colors ${isActive('/contact') ? 'text-white' : 'text-gray-400 hover:text-white'}`}>Contact</Link>
             
-            <a href="tel:+918087959271" className="text-[13px] font-medium text-amber-400 flex items-center gap-1.5 hover:text-amber-300 transition-colors">
+            <a href="tel:+918087959271" className="text-[13px] font-medium text-orange-500 flex items-center gap-1.5 hover:text-orange-400 transition-colors">
               <FiPhone className="text-xs" />
               +91 80879 59271
             </a>
 
-            <Link to="/my-bookings" className="text-[13px] font-semibold text-neutral-900 bg-amber-400 hover:bg-amber-300 px-4 py-2 rounded-md transition-colors">
+            <Link to="/my-bookings" className="text-[13px] font-semibold text-white bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-md transition-colors">
               My Bookings
             </Link>
           </div>

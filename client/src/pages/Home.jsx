@@ -80,11 +80,11 @@ const Home = () => {
         />
         
         {/* ─── HERO ─── */}
-        <section className="relative bg-neutral-900 pt-16 overflow-hidden">
+        <section className="relative bg-neutral-900 min-h-[100dvh] flex flex-col justify-center overflow-hidden pt-24 pb-12">
           {/* Video */}
           <div className="absolute inset-0 z-0">
              <video 
-               src="/RK_Hero.mp4" 
+               src="/RK_Hero.MP4" 
                autoPlay 
                loop 
                muted 
@@ -93,11 +93,11 @@ const Home = () => {
              />
           </div>
           
-          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
+          <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
                 Outstation Cab Booking <br className="hidden sm:block" />
-                <span className="text-amber-400">Anywhere in Maharashtra</span>
+                <span className="text-orange-500">Anywhere in Maharashtra</span>
               </h1>
               <p className="text-gray-300 text-sm sm:text-base mb-8 max-w-lg">
                 Affordable intercity cabs with verified drivers. Mumbai, Pune, Nashik, Nagpur and 50+ cities.
@@ -105,46 +105,46 @@ const Home = () => {
             </div>
 
             {/* Search Box */}
-            <div className="bg-white rounded-lg p-4 sm:p-5 max-w-3xl shadow-xl">
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 sm:p-5 max-w-3xl shadow-xl">
               
               {/* Trip Type Tabs */}
-              <div className="flex gap-0 mb-4 border-b border-gray-200">
+              <div className="flex gap-0 mb-4 border-b border-white/20">
                 <button 
                   onClick={() => setTripType('one-way')}
-                  className={`text-sm font-semibold pb-2.5 px-4 border-b-2 transition-colors ${tripType === 'one-way' ? 'border-amber-500 text-neutral-900' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                  className={`text-sm font-semibold pb-2.5 px-4 border-b-2 transition-colors ${tripType === 'one-way' ? 'border-orange-500 text-white' : 'border-transparent text-white/60 hover:text-white'}`}
                 >
                   One Way
                 </button>
                 <button 
                   onClick={() => setTripType('round-trip')}
-                  className={`text-sm font-semibold pb-2.5 px-4 border-b-2 transition-colors ${tripType === 'round-trip' ? 'border-amber-500 text-neutral-900' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                  className={`text-sm font-semibold pb-2.5 px-4 border-b-2 transition-colors ${tripType === 'round-trip' ? 'border-orange-500 text-white' : 'border-transparent text-white/60 hover:text-white'}`}
                 >
                   Round Trip
                 </button>
               </div>
 
-              <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 items-stretch">
+              <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">
                 
                 <div className="flex-1">
-                  <CityAutocomplete value={pickup} onChange={setPickup} placeholder="Pickup city" />
+                  <CityAutocomplete value={pickup} onChange={setPickup} placeholder="Pickup city" darkTheme={true} />
                 </div>
 
                 {/* Swap */}
                 <button 
                   type="button" 
                   onClick={handleSwap}
-                  className="self-center w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-400 hover:text-neutral-900 hover:border-neutral-900 transition-colors sm:rotate-0 rotate-90 flex-shrink-0"
+                  className="self-center w-8 h-8 sm:mb-2 rounded-full border border-white/30 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors sm:rotate-0 rotate-90 flex-shrink-0"
                 >
                   ⇄
                 </button>
 
                 <div className="flex-1">
-                  <CityAutocomplete value={drop} onChange={setDrop} placeholder="Drop city" isDrop={true} />
+                  <CityAutocomplete value={drop} onChange={setDrop} placeholder="Drop city" isDrop={true} darkTheme={true} />
                 </div>
 
                 <button 
                   type="submit" 
-                  className="bg-amber-500 hover:bg-amber-600 text-neutral-900 font-bold text-sm px-6 h-11 rounded-md transition-colors flex items-center justify-center gap-2 flex-shrink-0"
+                  className="bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm px-6 h-12 rounded-xl transition-colors flex items-center justify-center gap-2 flex-shrink-0 w-full sm:w-auto"
                 >
                   Search Cabs <FiArrowRight />
                 </button>
@@ -155,7 +155,7 @@ const Home = () => {
             <div className="flex flex-wrap gap-x-6 gap-y-2 mt-5">
               {['Verified Drivers', 'No Hidden Charges', '24/7 Support', 'Free Cancellation'].map(item => (
                 <span key={item} className="flex items-center gap-1.5 text-xs text-gray-300 font-medium">
-                  <FiCheck className="text-amber-400 text-sm" /> {item}
+                  <FiCheck className="text-orange-500 text-sm" /> {item}
                 </span>
               ))}
             </div>
@@ -170,7 +170,7 @@ const Home = () => {
                 <h2 className="text-xl sm:text-2xl font-bold text-neutral-900">Popular Routes</h2>
                 <p className="text-sm text-gray-500 mt-1">Most booked intercity routes</p>
               </div>
-              <Link to="/search" className="text-sm font-semibold text-amber-600 hover:text-amber-700 hidden sm:flex items-center gap-1">
+              <Link to="/search" className="text-sm font-semibold text-orange-600 hover:text-orange-700 hidden sm:flex items-center gap-1">
                 View all <FiArrowRight className="text-xs" />
               </Link>
             </div>
@@ -184,7 +184,7 @@ const Home = () => {
                 {popularRoutes.map((route) => (
                   <div 
                     key={route._id} 
-                    className="bg-white rounded-lg border border-gray-200 p-4 cursor-pointer hover:border-amber-400 hover:shadow-md transition-all flex items-center justify-between gap-4 group"
+                    className="bg-white rounded-lg border border-gray-200 p-4 cursor-pointer hover:border-orange-500 hover:shadow-md transition-all flex items-center justify-between gap-4 group"
                     onClick={() => navigate(`/search?pickup=${route.pickupCity}&drop=${route.destinationCity}&date=${new Date().toISOString().split('T')[0]}&trip=one-way`, { state: { selectedRoute: route } })} 
                   >
                     <div className="flex items-center gap-3 min-w-0">
@@ -200,7 +200,7 @@ const Home = () => {
                     </div>
                     <div className="text-right flex-shrink-0">
                       <p className="text-xs text-gray-500">{route.distance} km</p>
-                      <span className="text-xs font-semibold text-amber-600 group-hover:underline mt-1 inline-block">View →</span>
+                      <span className="text-xs font-semibold text-orange-600 group-hover:underline mt-1 inline-block">View →</span>
                     </div>
                   </div>
                 ))}
@@ -220,11 +220,11 @@ const Home = () => {
             </div>
             
             {loadingCabs ? (
-              <div className="flex justify-center py-12"><div className="w-8 h-8 border-3 border-amber-400 border-t-transparent rounded-full animate-spin"></div></div>
+              <div className="flex justify-center py-12"><div className="w-8 h-8 border-3 border-orange-500 border-t-transparent rounded-full animate-spin"></div></div>
             ) : (
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 {cabs.map((cab) => (
-                  <div key={cab._id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:border-amber-400 hover:shadow-md transition-all group">
+                  <div key={cab._id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:border-orange-500 hover:shadow-md transition-all group">
                     
                     {/* Image */}
                     <div className="relative bg-gray-50 h-32 sm:h-40 flex items-center justify-center p-3">
@@ -275,7 +275,7 @@ const Home = () => {
                 { num: '24/7', label: 'Customer Support' },
               ].map(stat => (
                 <div key={stat.label} className="text-center">
-                  <p className="text-2xl sm:text-3xl font-bold text-amber-400">{stat.num}</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-orange-500">{stat.num}</p>
                   <p className="text-xs sm:text-sm text-gray-400 mt-1">{stat.label}</p>
                 </div>
               ))}
@@ -297,7 +297,7 @@ const Home = () => {
                 <div key={i} className="bg-white rounded-lg border border-gray-200 p-5">
                   <div className="flex gap-0.5 mb-3">
                     {[1,2,3,4,5].map(s => (
-                      <FiStar key={s} className="text-amber-400 fill-amber-400 text-sm" />
+                      <FiStar key={s} className="text-orange-500 fill-orange-500 text-sm" />
                     ))}
                   </div>
                   <p className="text-sm text-gray-700 leading-relaxed mb-4">"{review.text}"</p>
@@ -317,7 +317,7 @@ const Home = () => {
         </section>
 
         {/* ─── CTA STRIP ─── */}
-        <section className="bg-amber-500 py-8 sm:py-10">
+        <section className="bg-orange-500 py-8 sm:py-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
               <h3 className="text-lg sm:text-xl font-bold text-neutral-900">Need a cab? Call us directly.</h3>

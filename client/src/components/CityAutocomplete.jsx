@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import citiesData from '../data/cities.json';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const CityAutocomplete = ({ value, onChange, placeholder, icon: Icon, iconColorClass = "text-black" }) => {
+const CityAutocomplete = ({ value, onChange, placeholder, icon: Icon, iconColorClass = "text-black", darkTheme = false }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const wrapperRef = useRef(null);
@@ -40,7 +40,7 @@ const CityAutocomplete = ({ value, onChange, placeholder, icon: Icon, iconColorC
 
   return (
     <div className="relative w-full" ref={wrapperRef}>
-      <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1.5 block ml-1">{placeholder}</label>
+      <label className={`text-[10px] font-bold uppercase tracking-widest mb-1.5 block ml-1 ${darkTheme ? 'text-white/80' : 'text-gray-500'}`}>{placeholder}</label>
       <div className="relative flex items-center">
         {Icon && (
           <div className="absolute left-4 z-10 flex items-center justify-center">
@@ -55,7 +55,7 @@ const CityAutocomplete = ({ value, onChange, placeholder, icon: Icon, iconColorC
           onFocus={() => {
             if (value && suggestions.length > 0) setIsOpen(true);
           }}
-          className={`w-full h-12 bg-gray-50/50 border border-gray-200 rounded-xl text-sm font-semibold text-black placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-black focus:bg-white shadow-saas-inner transition-colors duration-200 ${Icon ? 'pl-11 pr-4' : 'px-4'}`}
+          className={`w-full h-12 rounded-xl text-sm font-semibold focus:outline-none focus:ring-0 transition-colors duration-200 ${Icon ? 'pl-11 pr-4' : 'px-4'} ${darkTheme ? 'bg-white border border-transparent text-neutral-900 placeholder-gray-500 focus:border-orange-500 shadow-md' : 'bg-gray-50/50 border border-gray-200 text-black placeholder-gray-400 focus:border-black focus:bg-white shadow-saas-inner'}`}
           autoComplete="off"
         />
       </div>

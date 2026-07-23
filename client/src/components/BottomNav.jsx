@@ -25,12 +25,12 @@ const BottomNav = () => {
               {active && (
                 <motion.div 
                   layoutId="bottomNavActive" 
-                  className="absolute top-1.5 inset-x-4 h-0.5 bg-amber-400 rounded-full" 
+                  className="absolute top-1.5 inset-x-4 h-0.5 bg-orange-500 rounded-full" 
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 />
               )}
-              <tab.icon className={`text-[20px] mb-0.5 ${active ? 'text-amber-400' : 'text-gray-500'}`} />
-              <span className={`text-[9px] font-bold uppercase tracking-wider ${active ? 'text-amber-400' : 'text-gray-500'}`}>{tab.label}</span>
+              <tab.icon className={`text-[20px] mb-0.5 ${active ? 'text-orange-500' : 'text-gray-500'}`} />
+              <span className={`text-[9px] font-bold uppercase tracking-wider ${active ? 'text-orange-500' : 'text-gray-500'}`}>{tab.label}</span>
             </Link>
           );
         })}
