@@ -4,8 +4,10 @@ import toast from 'react-hot-toast';
 import { FiMail, FiUser, FiMessageSquare, FiSend, FiMapPin, FiPhone } from 'react-icons/fi';
 import PageTransition from '../components/PageTransition';
 import SEOHead from '../components/SEOHead';
+import { useBranding } from '../context/BrandingContext';
 
 const Contact = () => {
+  const { contentData } = useBranding();
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [loading, setLoading] = useState(false);
 
@@ -43,7 +45,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Email Support</h4>
-                  <p className="text-lg font-bold text-white">support@rktours.com</p>
+                  <p className="text-lg font-bold text-white">{contentData?.contactEmail || 'support@rktours.com'}</p>
                 </div>
               </div>
               <div className="flex items-center gap-6">
@@ -52,7 +54,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Priority Hotline</h4>
-                  <p className="text-lg font-bold text-white">+91 99999 99999</p>
+                  <p className="text-lg font-bold text-white">{contentData?.contactPhone || '+91 99999 99999'}</p>
                 </div>
               </div>
               <div className="flex items-center gap-6">
@@ -61,7 +63,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Headquarters</h4>
-                  <p className="text-lg font-bold text-white">Pune, Maharashtra, IN</p>
+                  <p className="text-sm font-bold text-white whitespace-pre-line">{contentData?.contactAddress || 'Pune, Maharashtra, IN'}</p>
                 </div>
               </div>
             </div>

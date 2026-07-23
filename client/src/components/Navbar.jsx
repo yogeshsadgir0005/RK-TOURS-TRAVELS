@@ -42,9 +42,9 @@ const Navbar = () => {
             <Link to="/about" className={`text-[13px] font-medium transition-colors ${isActive('/about') ? 'text-white' : 'text-gray-400 hover:text-white'}`}>About</Link>
             <Link to="/contact" className={`text-[13px] font-medium transition-colors ${isActive('/contact') ? 'text-white' : 'text-gray-400 hover:text-white'}`}>Contact</Link>
             
-            <a href="tel:+918087959271" className="text-[13px] font-medium text-white flex items-center gap-1.5 hover:text-gray-300 transition-colors">
+            <a href="tel:+919130899368" className="text-[13px] font-medium text-white flex items-center gap-1.5 hover:text-gray-300 transition-colors">
               <FiPhone className="text-xs" />
-              +91 80879 59271
+              +91 91308 99368
             </a>
 
             <Link to="/my-bookings" className="text-[13px] font-semibold text-white bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-md transition-colors">

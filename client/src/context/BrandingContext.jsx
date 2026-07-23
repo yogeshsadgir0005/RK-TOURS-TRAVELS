@@ -9,8 +9,8 @@ export const BrandingProvider = ({ children }) => {
   const [logoUrl, setLogoUrl] = useState('/RK1.png');
   const [siteName, setSiteName] = useState('RK TOURS & TRAVELS');
   const [contentData, setContentData] = useState({
-    contactAddress: "Pune, Maharashtra\nIndia 411001",
-    contactPhone: "+91 99999 99999",
+    contactAddress: "Mathura residency\nMurlidhar Vyas Colony, Prashant Nagar, Pathardi Phata, Nasik, Nashik, Maharashtra 422010",
+    contactPhone: "+91 9130899368",
     contactEmail: "support@rktours.com"
   });
   const [isLoading, setIsLoading] = useState(false);

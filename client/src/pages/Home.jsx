@@ -323,8 +323,8 @@ const Home = () => {
               <h3 className="text-lg sm:text-xl font-bold text-white">Need a cab? Call us directly.</h3>
               <p className="text-sm text-white/90">Available 24/7 for bookings and enquiries</p>
             </div>
-            <a href="tel:+918087959271" className="bg-neutral-900 text-white font-bold text-sm px-6 py-3 rounded-md flex items-center gap-2 hover:bg-neutral-800 transition-colors flex-shrink-0">
-              <FiPhoneCall /> +91 80879 59271
+            <a href="tel:+919130899368" className="bg-neutral-900 text-white font-bold text-sm px-6 py-3 rounded-md flex items-center gap-2 hover:bg-neutral-800 transition-colors flex-shrink-0">
+              <FiPhoneCall /> +91 91308 99368
             </a>
           </div>
         </section>

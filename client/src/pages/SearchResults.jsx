@@ -155,7 +155,7 @@ const SearchResults = () => {
         <SEOHead title={`${pickup} to ${drop} Cabs | RK Tours`} />
         
         {/* DASHBOARD HEADER */}
-        <div className="bg-bg-inverse pt-20 pb-24 px-4 sm:px-8 relative overflow-hidden">
+        <div className="bg-neutral-900 pt-20 pb-24 px-4 sm:px-8 relative overflow-hidden">
           <div className="absolute inset-0 noise-overlay"></div>
           
           <div className="max-w-7xl mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
