@@ -119,13 +119,13 @@ const Login = () => {
             </div>
 
             <div className="mb-10 text-center lg:text-left">
-              <h2 className="text-3xl font-extrabold text-black tracking-tight mb-2">Welcome back</h2>
-              <p className="text-sm text-gray-500 font-medium">Please enter your details to sign in.</p>
+              <h2 className="text-3xl font-extrabold text-white tracking-tight mb-2">Welcome back</h2>
+              <p className="text-sm text-gray-400 font-medium">Please enter your details to sign in.</p>
             </div>
 
             <button 
               onClick={() => googleLogin()}
-              className="w-full h-12 bg-white border border-gray-200 rounded-xl flex items-center justify-center gap-3 font-bold text-sm text-black hover:border-black hover:shadow-saas-sm transition-all mb-8 group"
+              className="w-full h-12 bg-white border border-transparent rounded-xl flex items-center justify-center gap-3 font-bold text-sm text-neutral-900 hover:bg-neutral-100 shadow-md transition-all mb-8 group"
             >
               <svg className="w-5 h-5 group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -137,22 +137,22 @@ const Login = () => {
             </button>
 
             <div className="flex items-center gap-4 mb-8">
-              <div className="h-px bg-gray-200 flex-1"></div>
+              <div className="h-px bg-neutral-800 flex-1"></div>
               <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Or email</span>
-              <div className="h-px bg-gray-200 flex-1"></div>
+              <div className="h-px bg-neutral-800 flex-1"></div>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5 block ml-1">Email address</label>
                 <div className="relative">
-                  <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 z-10" />
                   <input 
                     type="email" 
                     required 
                     value={email} 
                     onChange={(e) => setEmail(e.target.value)} 
-                    className="w-full h-12 pl-11 pr-4 bg-gray-50/50 border border-gray-200 rounded-xl text-sm font-semibold text-black focus:border-black focus:bg-white shadow-saas-inner outline-none transition-colors" 
+                    className="w-full h-12 pl-11 pr-4 bg-white border border-transparent rounded-xl text-sm font-bold text-neutral-900 placeholder-gray-500 focus:border-orange-500 outline-none shadow-md transition-colors" 
                   />
                 </div>
               </div>
@@ -160,16 +160,16 @@ const Login = () => {
               <div>
                 <div className="flex items-center justify-between mb-1.5 px-1">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block">Password</label>
-                  <Link to="/forgot-password" className="text-[10px] font-bold uppercase tracking-widest text-black hover:underline">Forgot?</Link>
+                  <Link to="/forgot-password" className="text-[10px] font-bold uppercase tracking-widest text-orange-500 hover:underline">Forgot?</Link>
                 </div>
                 <div className="relative">
-                  <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 z-10" />
                   <input 
                     type="password" 
                     required 
                     value={password} 
                     onChange={(e) => setPassword(e.target.value)} 
-                    className="w-full h-12 pl-11 pr-4 bg-gray-50/50 border border-gray-200 rounded-xl text-sm font-semibold text-black focus:border-black focus:bg-white shadow-saas-inner outline-none transition-colors" 
+                    className="w-full h-12 pl-11 pr-4 bg-white border border-transparent rounded-xl text-sm font-bold text-neutral-900 placeholder-gray-500 focus:border-orange-500 outline-none shadow-md transition-colors" 
                   />
                 </div>
               </div>
@@ -177,14 +177,14 @@ const Login = () => {
               <button 
                 type="submit" 
                 disabled={isLoading}
-                className="w-full h-12 mt-4 bg-gradient-to-b from-neutral-800 to-black text-white rounded-xl font-bold text-sm shadow-saas-glow border border-black/10 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-70 disabled:hover:scale-100"
+                className="w-full h-12 mt-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-sm shadow-lg flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-70 disabled:hover:scale-100"
               >
                 {isLoading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <>Sign In <FiArrowRight /></>}
               </button>
             </form>
 
-            <p className="mt-8 text-center text-sm text-gray-500 font-medium">
-              Don't have an account? <Link to="/signup" className="text-black font-bold hover:underline">Sign up</Link>
+            <p className="mt-8 text-center text-sm text-gray-400 font-medium">
+              Don't have an account? <Link to="/signup" className="text-orange-500 font-bold hover:underline">Sign up</Link>
             </p>
           </div>
         </div>

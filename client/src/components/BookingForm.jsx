@@ -6,13 +6,14 @@ import { generateWhatsAppLink } from '../utils/whatsapp';
 import { FiMapPin, FiCalendar, FiUser, FiPhone, FiSearch, FiArrowRight } from 'react-icons/fi';
 import { TbArrowsRightLeft } from 'react-icons/tb';
 import { FaCarSide } from 'react-icons/fa';
+import { DEFAULT_CABS, mergeDataById } from '../data/defaultData';
 
 const BookingForm = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
   
-  const [cabs, setCabs] = useState([]);
+  const [cabs, setCabs] = useState(DEFAULT_CABS);
   const [adminPhone, setAdminPhone] = useState('919130899368');
   const [formData, setFormData] = useState({
     pickupCity: '', destinationCity: '', journeyDate: '', tripType: 'One Way', cabTypeId: '',
@@ -27,14 +28,16 @@ const BookingForm = () => {
     // Fetch active cabs & admin settings
     const fetchData = async () => {
       try {
+        let fetched = [];
         const cachedCabs = sessionStorage.getItem('cabsData');
         if (cachedCabs) {
-          setCabs(JSON.parse(cachedCabs));
+          fetched = JSON.parse(cachedCabs);
         } else {
           const cabRes = await axiosInstance.get('/cabs');
-          setCabs(cabRes.data);
-          sessionStorage.setItem('cabsData', JSON.stringify(cabRes.data));
+          fetched = cabRes.data || [];
+          sessionStorage.setItem('cabsData', JSON.stringify(fetched));
         }
+        setCabs(mergeDataById(DEFAULT_CABS, fetched));
       } catch (err) { console.error("Failed to load initial data"); }
     };
     fetchData();

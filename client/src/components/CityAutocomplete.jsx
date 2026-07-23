@@ -43,8 +43,8 @@ const CityAutocomplete = ({ value, onChange, placeholder, icon: Icon, iconColorC
       <label className={`text-[10px] font-bold uppercase tracking-widest mb-1.5 block ml-1 ${darkTheme ? 'text-white/80' : 'text-gray-500'}`}>{placeholder}</label>
       <div className="relative flex items-center">
         {Icon && (
-          <div className="absolute left-4 z-10 flex items-center justify-center">
-            <Icon className={`text-lg ${iconColorClass}`} />
+          <div className="absolute left-3.5 sm:left-4 z-10 flex items-center justify-center">
+            <Icon className={`text-base sm:text-lg ${iconColorClass}`} />
           </div>
         )}
         <input
@@ -55,7 +55,7 @@ const CityAutocomplete = ({ value, onChange, placeholder, icon: Icon, iconColorC
           onFocus={() => {
             if (value && suggestions.length > 0) setIsOpen(true);
           }}
-          className={`w-full h-12 rounded-xl text-sm font-semibold focus:outline-none focus:ring-0 transition-colors duration-200 ${Icon ? 'pl-11 pr-4' : 'px-4'} ${darkTheme ? 'bg-white border border-transparent text-neutral-900 placeholder-gray-500 focus:border-orange-500 shadow-md' : 'bg-gray-50/50 border border-gray-200 text-black placeholder-gray-400 focus:border-black focus:bg-white shadow-saas-inner'}`}
+          className={`w-full h-11 sm:h-12 rounded-xl text-xs sm:text-sm font-semibold focus:outline-none focus:ring-0 transition-colors duration-200 ${Icon ? 'pl-9 sm:pl-11 pr-3.5 sm:pr-4' : 'px-3.5 sm:px-4'} ${darkTheme ? 'bg-white border border-transparent text-neutral-900 placeholder-gray-500 focus:border-orange-500 shadow-md' : 'bg-gray-50/50 border border-gray-200 text-black placeholder-gray-400 focus:border-black focus:bg-white shadow-saas-inner'}`}
           autoComplete="off"
         />
       </div>

@@ -6,6 +6,7 @@ import SEOHead from '../components/SEOHead';
 import PageTransition from '../components/PageTransition';
 import { CabSkeleton } from '../components/SkeletonLoader';
 import { GoogleMap, Marker, Polyline, useJsApiLoader } from '@react-google-maps/api';
+import { DEFAULT_CABS, mergeDataById } from '../data/defaultData';
 
 const mapContainerStyle = { width: '100%', height: '100%', borderRadius: '1.5rem' };
 const darkMapStyle = [
@@ -84,10 +85,15 @@ const SearchResults = () => {
         if (cachedCabs) {
           fetchedCabs = JSON.parse(cachedCabs);
         } else {
-          const res = await axiosInstance.get('/cabs');
-          fetchedCabs = res.data;
-          sessionStorage.setItem('cabsData', JSON.stringify(fetchedCabs));
+          try {
+            const res = await axiosInstance.get('/cabs');
+            fetchedCabs = res.data || [];
+            sessionStorage.setItem('cabsData', JSON.stringify(fetchedCabs));
+          } catch (err) {
+            console.error("Error fetching cabs:", err);
+          }
         }
+        fetchedCabs = mergeDataById(DEFAULT_CABS, fetchedCabs);
 
         if (cabType) {
           fetchedCabs = fetchedCabs.filter(cab => 
@@ -180,17 +186,17 @@ const SearchResults = () => {
               )}
 
               {/* Filters */}
-              <div className="flex flex-wrap items-center gap-4">
+              <div className="flex flex-wrap items-center gap-3">
                 <input 
                   type="date" 
                   value={date} 
                   onChange={(e) => setDate(e.target.value)} 
-                  className="bg-zinc-900 border border-zinc-800 text-white rounded-xl px-4 py-3 text-sm font-semibold focus:ring-1 focus:ring-white outline-none"
+                  className="bg-white text-neutral-900 border border-transparent rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold focus:border-orange-500 outline-none shadow-md"
                 />
                 <select 
                   value={tripType} 
                   onChange={(e) => setTripType(e.target.value)} 
-                  className="bg-zinc-900 border border-zinc-800 text-white rounded-xl px-4 py-3 text-sm font-semibold focus:ring-1 focus:ring-white outline-none appearance-none pr-8"
+                  className="bg-white text-neutral-900 border border-transparent rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold focus:border-orange-500 outline-none appearance-none pr-8 shadow-md"
                 >
                   <option value="one-way">One Way</option>
                   <option value="round-trip">Round Trip</option>
@@ -198,7 +204,7 @@ const SearchResults = () => {
                 <select 
                   value={cabType} 
                   onChange={(e) => setCabType(e.target.value)} 
-                  className="bg-zinc-900 border border-zinc-800 text-white rounded-xl px-4 py-3 text-sm font-semibold focus:ring-1 focus:ring-white outline-none appearance-none pr-8"
+                  className="bg-white text-neutral-900 border border-transparent rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold focus:border-orange-500 outline-none appearance-none pr-8 shadow-md"
                 >
                   <option value="">Any Vehicle</option>
                   <option value="sedan">Sedan</option>
@@ -289,9 +295,9 @@ const SearchResults = () => {
                     </div>
                     <button 
                       onClick={() => handleProceedToBook(cab)}
-                      className="w-auto md:w-full px-6 py-3 bg-black text-white rounded-xl font-bold text-sm shadow-saas-glow hover:bg-neutral-800 active:scale-95 transition-all"
+                      className="w-full md:w-auto px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-extrabold text-sm shadow-md active:scale-95 transition-all"
                     >
-                      Select
+                      Select Cab
                     </button>
                   </div>
 

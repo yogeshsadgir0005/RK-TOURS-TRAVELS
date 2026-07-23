@@ -36,7 +36,7 @@ const BookingPage = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
 
-  const { cab, journey, customFixedFare } = location.state || {};
+  const { cab, journey = {}, customFixedFare } = location.state || {};
 
   const [passengerName, setPassengerName] = useState(user?.name || '');
   const [passengerPhone, setPassengerPhone] = useState('');
@@ -61,11 +61,11 @@ const BookingPage = () => {
   const [dropCoords, setDropCoords] = useState(null);
 
   useEffect(() => {
-    if (!cab || !journey) {
-      toast.error('Booking details missing. Redirecting to search.');
+    if (!cab) {
+      toast.error('Cab details missing. Redirecting to search.');
       navigate('/search');
     }
-  }, [cab, journey, navigate]);
+  }, [cab, navigate]);
 
   useEffect(() => {
     if (pickupCity) {
@@ -131,7 +131,7 @@ const BookingPage = () => {
   const calculateFare = () => {
     if (customFixedFare) return { baseFare: customFixedFare, totalFare: customFixedFare };
     const dist = calculatedDistance || 0;
-    const isRoundTrip = journey.tripType === 'round-trip';
+    const isRoundTrip = journey?.tripType === 'round-trip';
     const multiplier = isRoundTrip ? 2 : 1;
     const totalDist = dist * multiplier;
     
@@ -139,7 +139,8 @@ const BookingPage = () => {
     const minKm = isRoundTrip ? 250 * 2 : 250; 
     const finalDist = Math.max(totalDist, minKm);
     
-    const baseFare = Math.round(finalDist * cab.pricePerKm);
+    const pricePerKm = cab?.pricePerKm || 15;
+    const baseFare = Math.round(finalDist * pricePerKm);
     return { baseFare, totalFare: baseFare };
   };
 
@@ -205,78 +206,82 @@ const BookingPage = () => {
             <form onSubmit={handleSubmit} className="space-y-8">
               
               {/* Section 1: Passenger */}
-              <div className="bg-neutral-900 p-8 rounded-[32px] border border-neutral-800 shadow-saas-sm">
-                <div className="flex items-center gap-4 mb-8">
-                  <div className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center text-sm font-bold">1</div>
+              <div className="bg-neutral-900 p-5 sm:p-8 rounded-2xl sm:rounded-[32px] border border-neutral-800 shadow-saas-sm">
+                <div className="flex items-center gap-4 mb-6 sm:mb-8">
+                  <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center text-sm font-bold">1</div>
                   <h2 className="text-xl font-bold text-white tracking-tight">Passenger Details</h2>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                   <div>
                     <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5 block ml-1">Full Name</label>
                     <div className="relative">
-                      <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                      <input type="text" required value={passengerName} onChange={(e) => setPassengerName(e.target.value)} className="w-full h-12 pl-11 pr-4 bg-neutral-800 border border-neutral-800 rounded-xl text-sm font-semibold text-white focus:border-white focus:bg-neutral-900 shadow-saas-inner outline-none transition-colors" />
+                      <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 z-10" />
+                      <input type="text" required value={passengerName} onChange={(e) => setPassengerName(e.target.value)} className="w-full h-11 sm:h-12 pl-11 pr-4 bg-white border border-transparent rounded-xl text-sm font-bold text-neutral-900 placeholder-gray-500 focus:border-orange-500 outline-none shadow-md transition-colors" />
                     </div>
                   </div>
                   <div>
                     <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5 block ml-1">Mobile Number</label>
                     <div className="relative">
-                      <FiPhone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                      <input type="tel" required value={passengerPhone} onChange={(e) => setPassengerPhone(e.target.value)} placeholder="10-digit mobile number" className="w-full h-12 pl-11 pr-4 bg-neutral-800 border border-neutral-800 rounded-xl text-sm font-semibold text-white focus:border-white focus:bg-neutral-900 shadow-saas-inner outline-none transition-colors" />
+                      <FiPhone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 z-10" />
+                      <input type="tel" required value={passengerPhone} onChange={(e) => setPassengerPhone(e.target.value)} placeholder="10-digit mobile number" className="w-full h-11 sm:h-12 pl-11 pr-4 bg-white border border-transparent rounded-xl text-sm font-bold text-neutral-900 placeholder-gray-500 focus:border-orange-500 outline-none shadow-md transition-colors" />
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Section 2: Exact Location */}
-              <div className="bg-neutral-900 p-8 rounded-[32px] border border-neutral-800 shadow-saas-sm">
-                <div className="flex items-center gap-4 mb-8">
-                  <div className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center text-sm font-bold">2</div>
+              <div className="bg-neutral-900 p-5 sm:p-8 rounded-2xl sm:rounded-[32px] border border-neutral-800 shadow-saas-sm">
+                <div className="flex items-center gap-4 mb-6 sm:mb-8">
+                  <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center text-sm font-bold">2</div>
                   <h2 className="text-xl font-bold text-white tracking-tight">Pickup & Drop Addresses</h2>
                 </div>
                 
-                <div className="space-y-6">
+                <div className="space-y-4 sm:space-y-6">
                   <div className="border border-neutral-800 rounded-2xl p-4 sm:p-6 relative">
-                    <div className="absolute top-6 left-6 w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                       <div className="w-2 h-2 bg-black rounded-full"></div>
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-7 h-7 bg-emerald-500/20 border border-emerald-500/40 rounded-full flex items-center justify-center flex-shrink-0">
+                         <div className="w-2.5 h-2.5 bg-emerald-400 rounded-full"></div>
+                      </div>
+                      <h3 className="text-sm font-bold text-white">Pickup Address</h3>
                     </div>
-                    <div className="ml-12">
-                      <h3 className="text-sm font-bold text-white mb-4">Pickup Address</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                         <div className="md:col-span-2">
                           <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1 block">Street / Area / Landmark</label>
-                          <input type="text" required value={pickupStreet} onChange={(e) => setPickupStreet(e.target.value)} placeholder="E.g., Flat 101, Galaxy Apts, MG Road" className="w-full h-12 px-4 bg-neutral-800 border border-neutral-800 rounded-xl text-sm font-semibold text-white focus:border-white focus:bg-neutral-900 shadow-saas-inner outline-none transition-colors" />
+                          <input type="text" required value={pickupStreet} onChange={(e) => setPickupStreet(e.target.value)} placeholder="E.g., Flat 101, Galaxy Apts, MG Road" className="w-full h-11 sm:h-12 px-4 bg-white border border-transparent rounded-xl text-sm font-bold text-neutral-900 placeholder-gray-500 focus:border-orange-500 outline-none shadow-md transition-colors" />
                         </div>
                         <div>
                           <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1 block">City</label>
-                          <input type="text" required value={pickupCity} onChange={(e) => setPickupCity(e.target.value)} className="w-full h-12 px-4 bg-neutral-800 border border-transparent rounded-xl text-sm font-semibold text-white outline-none cursor-not-allowed" readOnly />
+                          <input type="text" required value={pickupCity} onChange={(e) => setPickupCity(e.target.value)} className="w-full h-11 sm:h-12 px-4 bg-neutral-200 border border-transparent rounded-xl text-sm font-bold text-neutral-800 outline-none cursor-not-allowed" readOnly />
                         </div>
                         <div>
                           <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1 block">State</label>
-                          <input type="text" required value={pickupState} onChange={(e) => setPickupState(e.target.value)} className="w-full h-12 px-4 bg-neutral-800 border border-transparent rounded-xl text-sm font-semibold text-white outline-none cursor-not-allowed" readOnly />
+                          <input type="text" required value={pickupState} onChange={(e) => setPickupState(e.target.value)} className="w-full h-11 sm:h-12 px-4 bg-neutral-200 border border-transparent rounded-xl text-sm font-bold text-neutral-800 outline-none cursor-not-allowed" readOnly />
                         </div>
                       </div>
                     </div>
                   </div>
 
                   <div className="border border-neutral-800 rounded-2xl p-4 sm:p-6 relative">
-                    <div className="absolute top-6 left-6 w-8 h-8 border-2 border-white rounded-full flex items-center justify-center">
-                       <div className="w-2 h-2 bg-white rounded-full"></div>
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-7 h-7 bg-rose-500/20 border border-rose-500/40 rounded-full flex items-center justify-center flex-shrink-0">
+                         <div className="w-2.5 h-2.5 bg-rose-400 rounded-full"></div>
+                      </div>
+                      <h3 className="text-sm font-bold text-white">Drop Address</h3>
                     </div>
-                    <div className="ml-12">
-                      <h3 className="text-sm font-bold text-white mb-4">Drop Address</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                         <div className="md:col-span-2">
                           <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1 block">Street / Area / Landmark</label>
-                          <input type="text" required value={dropStreet} onChange={(e) => setDropStreet(e.target.value)} placeholder="E.g., Airport Terminal 2" className="w-full h-12 px-4 bg-neutral-800 border border-neutral-800 rounded-xl text-sm font-semibold text-white focus:border-white focus:bg-neutral-900 shadow-saas-inner outline-none transition-colors" />
+                          <input type="text" required value={dropStreet} onChange={(e) => setDropStreet(e.target.value)} placeholder="E.g., Airport Terminal 2" className="w-full h-11 sm:h-12 px-4 bg-white border border-transparent rounded-xl text-sm font-bold text-neutral-900 placeholder-gray-500 focus:border-orange-500 outline-none shadow-md transition-colors" />
                         </div>
                         <div>
                           <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1 block">City</label>
-                          <input type="text" required value={dropCity} onChange={(e) => setDropCity(e.target.value)} className="w-full h-12 px-4 bg-neutral-800 border border-transparent rounded-xl text-sm font-semibold text-white outline-none cursor-not-allowed" readOnly />
+                          <input type="text" required value={dropCity} onChange={(e) => setDropCity(e.target.value)} className="w-full h-11 sm:h-12 px-4 bg-neutral-200 border border-transparent rounded-xl text-sm font-bold text-neutral-800 outline-none cursor-not-allowed" readOnly />
                         </div>
                         <div>
                           <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1 block">State</label>
-                          <input type="text" required value={dropState} onChange={(e) => setDropState(e.target.value)} className="w-full h-12 px-4 bg-neutral-800 border border-transparent rounded-xl text-sm font-semibold text-white outline-none cursor-not-allowed" readOnly />
+                          <input type="text" required value={dropState} onChange={(e) => setDropState(e.target.value)} className="w-full h-11 sm:h-12 px-4 bg-neutral-200 border border-transparent rounded-xl text-sm font-bold text-neutral-800 outline-none cursor-not-allowed" readOnly />
                         </div>
                       </div>
                     </div>

@@ -69,31 +69,31 @@ const Contact = () => {
             </div>
           </div>
 
-          <div className="bg-neutral-900 p-8 sm:p-10 rounded-[32px] border border-neutral-800 shadow-saas-lg">
+          <div className="bg-neutral-900 p-6 sm:p-10 rounded-2xl sm:rounded-[32px] border border-neutral-800 shadow-saas-lg">
             <h3 className="text-2xl font-extrabold text-white tracking-tight mb-8">Send a message</h3>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5 block ml-1">Full Name</label>
                 <div className="relative">
-                  <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input type="text" required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full h-12 pl-11 pr-4 bg-neutral-800/50 border border-neutral-700 rounded-xl text-sm font-semibold text-white focus:border-neutral-500 focus:bg-neutral-900 shadow-saas-inner outline-none transition-colors" />
+                  <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 z-10" />
+                  <input type="text" required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full h-12 pl-11 pr-4 bg-white border border-transparent rounded-xl text-sm font-bold text-neutral-900 placeholder-gray-500 focus:border-orange-500 outline-none shadow-md transition-colors" />
                 </div>
               </div>
               <div>
                 <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5 block ml-1">Email Address</label>
                 <div className="relative">
-                  <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input type="email" required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full h-12 pl-11 pr-4 bg-neutral-800/50 border border-neutral-700 rounded-xl text-sm font-semibold text-white focus:border-neutral-500 focus:bg-neutral-900 shadow-saas-inner outline-none transition-colors" />
+                  <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 z-10" />
+                  <input type="email" required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full h-12 pl-11 pr-4 bg-white border border-transparent rounded-xl text-sm font-bold text-neutral-900 placeholder-gray-500 focus:border-orange-500 outline-none shadow-md transition-colors" />
                 </div>
               </div>
               <div>
                 <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5 block ml-1">Message</label>
                 <div className="relative">
-                  <FiMessageSquare className="absolute left-4 top-4 text-gray-400" />
-                  <textarea required rows="4" value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})} className="w-full pl-11 pr-4 py-3 bg-neutral-800/50 border border-neutral-700 rounded-xl text-sm font-semibold text-white focus:border-neutral-500 focus:bg-neutral-900 shadow-saas-inner outline-none transition-colors resize-none"></textarea>
+                  <FiMessageSquare className="absolute left-4 top-4 text-gray-500 z-10" />
+                  <textarea required rows="4" value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})} className="w-full pl-11 pr-4 py-3 bg-white border border-transparent rounded-xl text-sm font-bold text-neutral-900 placeholder-gray-500 focus:border-orange-500 outline-none shadow-md transition-colors resize-none"></textarea>
                 </div>
               </div>
-              <button type="submit" disabled={loading} className="w-full h-12 bg-black text-white rounded-xl font-bold text-sm shadow-saas-glow hover:bg-neutral-800 active:scale-95 transition-all disabled:opacity-70 flex items-center justify-center gap-2">
+              <button type="submit" disabled={loading} className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-sm shadow-md hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-70 flex items-center justify-center gap-2">
                 {loading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <>Send Message <FiSend /></>}
               </button>
             </form>
