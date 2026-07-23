@@ -84,12 +84,12 @@ const Home = () => {
           {/* Video */}
           <div className="absolute inset-0 z-0">
              <video 
-               src="/RK_Hero.mp4" 
+               src="/rk_hero_bg.mp4" 
                autoPlay 
                loop 
                muted 
                playsInline 
-               className="w-full h-full object-cover opacity-40" 
+               className="w-full h-full object-cover opacity-80" 
              />
           </div>
           

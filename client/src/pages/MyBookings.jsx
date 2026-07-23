@@ -68,7 +68,7 @@ const BookingAccordion = ({ booking, onCancel }) => {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            <div className="border-t border-neutral-800 bg-neutral-900/50"
+            className="border-t border-neutral-800 bg-neutral-900/50"
           >
             <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
               
