@@ -72,7 +72,7 @@ const Home = () => {
 
   return (
     <PageTransition>
-      <div className="font-sans bg-white min-h-screen">
+      <div className="font-sans bg-neutral-900 min-h-screen">
         <SEOHead 
           title="RK Tours & Travels — Outstation Cab Booking" 
           description="Book outstation cabs across Maharashtra. Reliable service, transparent pricing, 24/7 availability."
@@ -84,7 +84,7 @@ const Home = () => {
           {/* Video */}
           <div className="absolute inset-0 z-0">
              <video 
-               src="/RK_Hero.MP4" 
+               src="/RK_Hero.mp4" 
                autoPlay 
                loop 
                muted 
@@ -163,12 +163,12 @@ const Home = () => {
         </section>
 
         {/* ─── POPULAR ROUTES ─── */}
-        <section className="py-10 sm:py-14 bg-gray-50">
+        <section className="py-10 sm:py-14 bg-neutral-800">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-end justify-between mb-6">
               <div>
-                <h2 className="text-xl sm:text-2xl font-bold text-neutral-900">Popular Routes</h2>
-                <p className="text-sm text-gray-500 mt-1">Most booked intercity routes</p>
+                <h2 className="text-xl sm:text-2xl font-bold text-white">Popular Routes</h2>
+                <p className="text-sm text-gray-400 mt-1">Most booked intercity routes</p>
               </div>
               <Link to="/search" className="text-sm font-semibold text-orange-600 hover:text-orange-700 hidden sm:flex items-center gap-1">
                 View all <FiArrowRight className="text-xs" />
@@ -184,22 +184,22 @@ const Home = () => {
                 {popularRoutes.map((route) => (
                   <div 
                     key={route._id} 
-                    className="bg-white rounded-lg border border-gray-200 p-4 cursor-pointer hover:border-orange-500 hover:shadow-md transition-all flex items-center justify-between gap-4 group"
+                    className="bg-neutral-900 rounded-lg border border-neutral-800 p-4 cursor-pointer hover:border-orange-500 hover:shadow-md transition-all flex items-center justify-between gap-4 group"
                     onClick={() => navigate(`/search?pickup=${route.pickupCity}&drop=${route.destinationCity}&date=${new Date().toISOString().split('T')[0]}&trip=one-way`, { state: { selectedRoute: route } })} 
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="flex flex-col items-center gap-0.5 flex-shrink-0">
-                        <div className="w-2.5 h-2.5 rounded-full border-2 border-green-500 bg-white"></div>
+                        <div className="w-2.5 h-2.5 rounded-full border-2 border-green-500 bg-neutral-900"></div>
                         <div className="w-px h-5 bg-gray-300"></div>
-                        <div className="w-2.5 h-2.5 rounded-full border-2 border-red-500 bg-white"></div>
+                        <div className="w-2.5 h-2.5 rounded-full border-2 border-red-500 bg-neutral-900"></div>
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold text-neutral-900 truncate">{route.pickupCity}</p>
-                        <p className="text-sm font-semibold text-neutral-900 truncate mt-1">{route.destinationCity}</p>
+                        <p className="text-sm font-semibold text-white truncate">{route.pickupCity}</p>
+                        <p className="text-sm font-semibold text-white truncate mt-1">{route.destinationCity}</p>
                       </div>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <p className="text-xs text-gray-500">{route.distance} km</p>
+                      <p className="text-xs text-gray-400">{route.distance} km</p>
                       <span className="text-xs font-semibold text-orange-600 group-hover:underline mt-1 inline-block">View →</span>
                     </div>
                   </div>
@@ -210,12 +210,12 @@ const Home = () => {
         </section>
 
         {/* ─── OUR FLEET ─── */}
-        <section className="py-10 sm:py-14 bg-white">
+        <section className="py-10 sm:py-14 bg-neutral-900">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-end justify-between mb-6">
               <div>
-                <h2 className="text-xl sm:text-2xl font-bold text-neutral-900">Our Fleet</h2>
-                <p className="text-sm text-gray-500 mt-1">Well-maintained vehicles for every budget</p>
+                <h2 className="text-xl sm:text-2xl font-bold text-white">Our Fleet</h2>
+                <p className="text-sm text-gray-400 mt-1">Well-maintained vehicles for every budget</p>
               </div>
             </div>
             
@@ -224,10 +224,10 @@ const Home = () => {
             ) : (
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 {cabs.map((cab) => (
-                  <div key={cab._id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:border-orange-500 hover:shadow-md transition-all group">
+                  <div key={cab._id} className="bg-neutral-800 rounded-lg border border-neutral-800 overflow-hidden hover:border-orange-500 hover:shadow-md transition-all group">
                     
                     {/* Image */}
-                    <div className="relative bg-gray-50 h-32 sm:h-40 flex items-center justify-center p-3">
+                    <div className="relative bg-neutral-900 h-32 sm:h-40 flex items-center justify-center p-3">
                       <span className="absolute top-2 right-2 bg-neutral-900 text-white text-[9px] font-bold px-2 py-0.5 rounded">
                         {cab.acStatus || 'AC'}
                       </span>
@@ -242,16 +242,16 @@ const Home = () => {
                     <div className="p-3 sm:p-4">
                       <div className="flex items-start justify-between gap-2 mb-2">
                         <div className="min-w-0">
-                          <h3 className="text-sm font-bold text-neutral-900 truncate">{cab.name}</h3>
-                          <p className="text-[11px] text-gray-500 uppercase">{cab.category || 'Sedan'}</p>
+                          <h3 className="text-sm font-bold text-white truncate">{cab.name}</h3>
+                          <p className="text-[11px] text-gray-400 uppercase">{cab.category || 'Sedan'}</p>
                         </div>
                         <div className="text-right flex-shrink-0">
-                          <span className="text-base sm:text-lg font-bold text-neutral-900">₹{cab.pricePerKm}</span>
+                          <span className="text-base sm:text-lg font-bold text-white">₹{cab.pricePerKm}</span>
                           <span className="text-[10px] text-gray-400">/km</span>
                         </div>
                       </div>
                       
-                      <div className="flex gap-2 text-[11px] text-gray-500 font-medium">
+                      <div className="flex gap-2 text-[11px] text-gray-400 font-medium">
                         <span className="flex items-center gap-1"><FiUsers className="text-[11px]" /> {cab.seats} seats</span>
                         <span>•</span>
                         <span className="flex items-center gap-1"><FiFilter className="text-[11px]" /> {cab.fuelType || 'Petrol'}</span>
@@ -284,9 +284,9 @@ const Home = () => {
         </section>
 
         {/* ─── TESTIMONIALS ─── */}
-        <section className="py-10 sm:py-14 bg-gray-50">
+        <section className="py-10 sm:py-14 bg-neutral-800">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 mb-6">What our customers say</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-white mb-6">What our customers say</h2>
             
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
@@ -294,19 +294,19 @@ const Home = () => {
                 { name: "Priya M.", city: "Nashik", text: "Transparent pricing with no hidden charges. The fare shown was exactly what I paid. Will use again." },
                 { name: "Amit K.", city: "Mumbai", text: "Used RK Tours for my family trip. Comfortable Innova, professional driver. Highly recommended." }
               ].map((review, i) => (
-                <div key={i} className="bg-white rounded-lg border border-gray-200 p-5">
+                <div key={i} className="bg-neutral-900 rounded-lg border border-neutral-800 p-5">
                   <div className="flex gap-0.5 mb-3">
                     {[1,2,3,4,5].map(s => (
                       <FiStar key={s} className="text-orange-500 fill-orange-500 text-sm" />
                     ))}
                   </div>
-                  <p className="text-sm text-gray-700 leading-relaxed mb-4">"{review.text}"</p>
+                  <p className="text-sm text-gray-300 leading-relaxed mb-4">"{review.text}"</p>
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-neutral-900 text-white flex items-center justify-center text-xs font-bold">
+                    <div className="w-8 h-8 rounded-full bg-neutral-800 text-white flex items-center justify-center text-xs font-bold">
                       {review.name.charAt(0)}
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-neutral-900">{review.name}</p>
+                      <p className="text-sm font-semibold text-white">{review.name}</p>
                       <p className="text-[11px] text-gray-400">{review.city}</p>
                     </div>
                   </div>
@@ -320,8 +320,8 @@ const Home = () => {
         <section className="bg-orange-500 py-8 sm:py-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
-              <h3 className="text-lg sm:text-xl font-bold text-neutral-900">Need a cab? Call us directly.</h3>
-              <p className="text-sm text-neutral-700">Available 24/7 for bookings and enquiries</p>
+              <h3 className="text-lg sm:text-xl font-bold text-white">Need a cab? Call us directly.</h3>
+              <p className="text-sm text-white/90">Available 24/7 for bookings and enquiries</p>
             </div>
             <a href="tel:+918087959271" className="bg-neutral-900 text-white font-bold text-sm px-6 py-3 rounded-md flex items-center gap-2 hover:bg-neutral-800 transition-colors flex-shrink-0">
               <FiPhoneCall /> +91 80879 59271

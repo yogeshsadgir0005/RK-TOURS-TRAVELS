@@ -5,23 +5,23 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
   --font-mono: "JetBrains Mono", "Menlo", monospace;
 
-  --color-bg-primary: #ffffff;
-  --color-bg-secondary: #fafafa;
-  --color-bg-tertiary: #f5f5f5;
-  --color-bg-inverse: #0a0a0a;
-  --color-bg-inverse-elevated: #171717;
+  --color-bg-primary: #0a0a0a;
+  --color-bg-secondary: #121212;
+  --color-bg-tertiary: #171717;
+  --color-bg-inverse: #ffffff;
+  --color-bg-inverse-elevated: #fafafa;
 
-  --color-brand-primary: #000000;
-  --color-brand-accent: #2563eb;
+  --color-brand-primary: #ffffff;
+  --color-brand-accent: #f97316;
 
-  --color-border-subtle: rgba(0, 0, 0, 0.05);
-  --color-border-strong: rgba(0, 0, 0, 0.1);
+  --color-border-subtle: rgba(255, 255, 255, 0.05);
+  --color-border-strong: rgba(255, 255, 255, 0.1);
 
-  --shadow-saas-sm: 0px 1px 2px rgba(0, 0, 0, 0.04), 0px 1px 1px rgba(0, 0, 0, 0.02);
-  --shadow-saas-md: 0px 4px 12px -2px rgba(0, 0, 0, 0.05), 0px 0px 1px rgba(0, 0, 0, 0.1);
-  --shadow-saas-lg: 0px 12px 32px -4px rgba(0, 0, 0, 0.08), 0px 0px 1px rgba(0, 0, 0, 0.1);
-  --shadow-saas-glow: 0px 0px 24px -4px rgba(0, 0, 0, 0.15), inset 0px 1px 0px rgba(255,255,255,0.2);
-  --shadow-saas-inner: inset 0px 2px 4px rgba(0, 0, 0, 0.02);
+  --shadow-saas-sm: 0px 1px 2px rgba(0, 0, 0, 0.5), 0px 1px 1px rgba(0, 0, 0, 0.3);
+  --shadow-saas-md: 0px 4px 12px -2px rgba(0, 0, 0, 0.6), 0px 0px 1px rgba(0, 0, 0, 0.4);
+  --shadow-saas-lg: 0px 12px 32px -4px rgba(0, 0, 0, 0.8), 0px 0px 1px rgba(0, 0, 0, 0.5);
+  --shadow-saas-glow: 0px 0px 24px -4px rgba(249, 115, 22, 0.2), inset 0px 1px 0px rgba(255,255,255,0.05);
+  --shadow-saas-inner: inset 0px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 @layer base {

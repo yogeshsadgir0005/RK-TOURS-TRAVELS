@@ -238,51 +238,51 @@ const SearchResults = () => {
           {loading ? (
             <div className="flex flex-col gap-4">
               {[1, 2, 3, 4].map(i => (
-                <div key={i} className="bg-white rounded-2xl h-32 animate-pulse border border-gray-100"></div>
+                <div key={i} className="bg-neutral-800 rounded-2xl h-32 animate-pulse border border-neutral-800"></div>
               ))}
             </div>
           ) : cabs.length === 0 ? (
-            <div className="bg-white rounded-[32px] shadow-saas-sm border border-gray-100 p-12 text-center">
-              <h3 className="text-xl font-extrabold text-black mb-2 tracking-tight">No Vehicles Available</h3>
-              <p className="text-sm font-medium text-gray-500">Try adjusting your filters or selecting a different date.</p>
+            <div className="bg-neutral-800 rounded-[32px] shadow-saas-sm border border-neutral-800 p-12 text-center">
+              <h3 className="text-xl font-extrabold text-white mb-2 tracking-tight">No Vehicles Available</h3>
+              <p className="text-sm font-medium text-gray-400">Try adjusting your filters or selecting a different date.</p>
             </div>
           ) : (
             <div className="flex flex-col gap-4">
               {cabs.map((cab) => (
-                <div key={cab._id} className="bg-white rounded-[24px] p-4 sm:p-6 border border-gray-100 shadow-saas-sm flex flex-col md:flex-row items-center gap-6 hover:border-black/10 hover:shadow-saas-md transition-all duration-300 group">
+                <div key={cab._id} className="bg-neutral-800 rounded-[24px] p-4 sm:p-6 border border-neutral-800 shadow-saas-sm flex flex-col md:flex-row items-center gap-6 hover:border-neutral-700 hover:shadow-saas-md transition-all duration-300 group">
                   
                   {/* Left: Image */}
-                  <div className="w-full md:w-40 h-28 bg-gray-50 rounded-[16px] p-2 flex items-center justify-center flex-shrink-0 group-hover:bg-gray-100 transition-colors">
+                  <div className="w-full md:w-40 h-28 bg-neutral-900 rounded-[16px] p-2 flex items-center justify-center flex-shrink-0 group-hover:bg-neutral-800 transition-colors">
                     <img src={cab.image || 'https://via.placeholder.com/400x300?text=Cab'} alt={cab.name} className="max-w-full max-h-full object-contain drop-shadow-[0_10px_10px_rgba(0,0,0,0.1)] group-hover:scale-105 transition-transform duration-300" />
                   </div>
                   
                   {/* Middle: Details */}
                   <div className="flex-grow w-full">
                     <div className="flex items-center gap-3 mb-1">
-                      <h3 className="text-xl font-extrabold text-black tracking-tight">{cab.name}</h3>
-                      <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-[9px] font-black uppercase tracking-widest">{cab.category || 'Sedan'}</span>
+                      <h3 className="text-xl font-extrabold text-white tracking-tight">{cab.name}</h3>
+                      <span className="px-2 py-0.5 bg-neutral-900 text-gray-400 rounded text-[9px] font-black uppercase tracking-widest">{cab.category || 'Sedan'}</span>
                     </div>
                     <div className="flex items-center gap-2 mt-3 flex-wrap">
-                      <span className="h-6 px-2.5 bg-gray-50 border border-gray-100 rounded-md text-[10px] font-bold uppercase text-gray-500 flex items-center gap-1.5"><FiUsers className="text-black" /> {cab.seats} Seats</span>
-                      <span className="h-6 px-2.5 bg-gray-50 border border-gray-100 rounded-md text-[10px] font-bold uppercase text-gray-500 flex items-center gap-1.5"><FiFilter className="text-black" /> {cab.fuelType || 'Petrol'}</span>
-                      <span className="h-6 px-2.5 bg-gray-50 border border-gray-100 rounded-md text-[10px] font-bold uppercase text-gray-500 flex items-center gap-1.5"><FiSettings className="text-black" /> {cab.acStatus || 'AC'}</span>
+                      <span className="h-6 px-2.5 bg-neutral-900 border border-neutral-800 rounded-md text-[10px] font-bold uppercase text-gray-400 flex items-center gap-1.5"><FiUsers className="text-white" /> {cab.seats} Seats</span>
+                      <span className="h-6 px-2.5 bg-neutral-900 border border-neutral-800 rounded-md text-[10px] font-bold uppercase text-gray-400 flex items-center gap-1.5"><FiFilter className="text-white" /> {cab.fuelType || 'Petrol'}</span>
+                      <span className="h-6 px-2.5 bg-neutral-900 border border-neutral-800 rounded-md text-[10px] font-bold uppercase text-gray-400 flex items-center gap-1.5"><FiSettings className="text-white" /> {cab.acStatus || 'AC'}</span>
                     </div>
                   </div>
 
                   {/* Right: Price & Action */}
-                  <div className="flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto md:min-w-[140px] border-t md:border-t-0 border-gray-100 pt-4 md:pt-0">
+                  <div className="flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto md:min-w-[140px] border-t md:border-t-0 border-neutral-800 pt-4 md:pt-0">
                     <div className="text-left md:text-right mb-0 md:mb-4">
                       {cab.customFixedFare ? (
                         <>
                           <div className="text-xs font-bold uppercase tracking-widest text-green-600 mb-0.5">Fixed Fare</div>
-                          <div className="text-2xl font-black text-black tracking-tighter">₹{cab.customFixedFare}</div>
+                          <div className="text-2xl font-black text-white tracking-tighter">₹{cab.customFixedFare}</div>
                         </>
                       ) : (
                         <>
                           <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Estimated</div>
                           <div className="flex items-baseline gap-1">
-                            <span className="text-2xl font-black text-black tracking-tighter">₹{cab.pricePerKm}</span>
-                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">/km</span>
+                            <span className="text-2xl font-black text-white tracking-tighter">₹{cab.pricePerKm}</span>
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">/km</span>
                           </div>
                         </>
                       )}

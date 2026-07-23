@@ -11,7 +11,7 @@ const RoutePage = () => {
   const drop = cities[1].charAt(0).toUpperCase() + cities[1].slice(1);
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-neutral-900 min-h-screen text-white">
       <SEOHead 
         title={`Cab from ${pickup} to ${drop} - Best One Way Taxi Fares | RK Tours & Travels`} 
         description={`Book cheap and reliable cabs from ${pickup} to ${drop}. Experienced drivers, clean cars, and timely service. 24/7 customer support.`} 
@@ -29,7 +29,7 @@ const RoutePage = () => {
         }}
       />
 
-      <div className="pt-24 pb-12 bg-blue-900 text-white text-center px-4">
+      <div className="pt-24 pb-12 bg-neutral-800 text-white text-center px-4">
         <h1 className="text-4xl font-bold">{`Cab Booking from ${pickup} to ${drop}`}</h1>
       </div>
 

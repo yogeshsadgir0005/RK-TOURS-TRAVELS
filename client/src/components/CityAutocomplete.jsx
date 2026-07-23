@@ -67,21 +67,21 @@ const CityAutocomplete = ({ value, onChange, placeholder, icon: Icon, iconColorC
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 4, scale: 0.98 }}
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            className="absolute z-50 w-full mt-2 bg-white/95 backdrop-blur-xl border border-gray-100 rounded-2xl shadow-saas-lg overflow-hidden"
+            className={`absolute z-50 w-full mt-2 backdrop-blur-xl rounded-2xl shadow-saas-lg overflow-hidden ${darkTheme ? 'bg-neutral-900/95 border border-neutral-800' : 'bg-white/95 border border-gray-100'}`}
           >
             <ul className="max-h-60 overflow-y-auto py-2">
               {suggestions.map((city, index) => (
                 <li
                   key={index}
                   onClick={() => handleSelectCity(city.name)}
-                  className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center gap-3 transition-colors border-b border-gray-50 last:border-0"
+                  className={`px-4 py-3 cursor-pointer flex items-center gap-3 transition-colors border-b last:border-0 ${darkTheme ? 'hover:bg-neutral-800 border-neutral-800' : 'hover:bg-gray-50 border-gray-50'}`}
                 >
-                  <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                    <span className="text-[10px] font-bold text-gray-500">{city.state.substring(0, 2).toUpperCase()}</span>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${darkTheme ? 'bg-neutral-800' : 'bg-gray-100'}`}>
+                    <span className={`text-[10px] font-bold ${darkTheme ? 'text-gray-400' : 'text-gray-500'}`}>{city.state.substring(0, 2).toUpperCase()}</span>
                   </div>
                   <div>
-                    <span className="block text-sm font-bold text-black">{city.name}</span>
-                    <span className="block text-[10px] font-semibold uppercase tracking-wider text-gray-400 mt-0.5">{city.state}</span>
+                    <span className={`block text-sm font-bold ${darkTheme ? 'text-white' : 'text-black'}`}>{city.name}</span>
+                    <span className={`block text-[10px] font-semibold uppercase tracking-wider mt-0.5 ${darkTheme ? 'text-gray-500' : 'text-gray-400'}`}>{city.state}</span>
                   </div>
                 </li>
               ))}
