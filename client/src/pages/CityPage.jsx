@@ -1,13 +1,15 @@
 import { useParams } from 'react-router-dom';
 import SEOHead from '../components/SEOHead';
 import BookingForm from '../components/BookingForm';
+import PageTransition from '../components/PageTransition';
 
 const CityPage = () => {
   const { citySlug } = useParams();
   const cityName = citySlug.charAt(0).toUpperCase() + citySlug.slice(1);
 
   return (
-    <div className="bg-neutral-900 min-h-screen text-white">
+    <PageTransition>
+      <div className="bg-neutral-900 min-h-screen text-white">
       <SEOHead 
         title={`Cabs in ${cityName} - Top Rated Taxi Service | RK Tours & Travels`} 
         description={`Book the best and most affordable cabs in ${cityName}. Reliable local and outstation taxi service with verified drivers.`} 
@@ -53,7 +55,8 @@ const CityPage = () => {
            </div>
         </div>
       </div>
-    </div>
+      </div>
+    </PageTransition>
   );
 };
 export default CityPage;

@@ -73,7 +73,7 @@ const Home = () => {
         />
         
         {/* ─── HERO ─── */}
-        <section className="relative bg-neutral-900 overflow-hidden pt-24 sm:pt-28 pb-10 sm:pb-14">
+        <section data-motion-section="hero" className="relative bg-neutral-900 overflow-hidden pt-24 sm:pt-28 pb-10 sm:pb-14 lg:min-h-screen lg:flex lg:items-center lg:pt-20 lg:pb-12">
           {/* Video with Mobile-First Fit & Dark Gradient Mask */}
           <div className="absolute inset-0 z-0 overflow-hidden">
              <video 
@@ -101,7 +101,7 @@ const Home = () => {
             </div>
 
             {/* Search Box */}
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl sm:rounded-xl p-4 sm:p-5 max-w-3xl shadow-xl">
+            <div data-motion-booking className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl sm:rounded-xl p-4 sm:p-5 max-w-3xl shadow-xl">
               
               {/* Trip Type Tabs */}
               <div className="flex gap-0 mb-3 sm:mb-4 border-b border-white/20">
@@ -154,7 +154,7 @@ const Home = () => {
             </div>
 
             {/* Trust Strip */}
-            <div className="flex flex-wrap gap-x-5 gap-y-1.5 mt-4 sm:mt-5">
+            <div data-motion-trust className="flex flex-wrap gap-x-5 gap-y-1.5 mt-4 sm:mt-5">
               {['Verified Drivers', 'No Hidden Charges', '24/7 Support', 'Free Cancellation'].map(item => (
                 <span key={item} className="flex items-center gap-1.5 text-xs text-gray-300 font-medium">
                   <FiCheck className="text-orange-500 text-sm" /> {item}
@@ -165,7 +165,7 @@ const Home = () => {
         </section>
 
         {/* ─── POPULAR ROUTES ─── */}
-        <section className="py-10 sm:py-14 bg-neutral-800">
+        <section data-motion-section="routes" className="py-10 sm:py-14 bg-neutral-800">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-end justify-between mb-6">
               <div>
@@ -186,6 +186,7 @@ const Home = () => {
                 {popularRoutes.map((route) => (
                   <div 
                     key={route._id} 
+                    data-motion-card="route"
                     className="bg-neutral-900/90 rounded-2xl border border-neutral-800 p-5 sm:p-6 cursor-pointer hover:border-orange-500/60 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden"
                     onClick={() => navigate(`/search?pickup=${route.pickupCity}&drop=${route.destinationCity}&date=${new Date().toISOString().split('T')[0]}&trip=one-way`, { state: { selectedRoute: route } })} 
                   >
@@ -254,7 +255,7 @@ const Home = () => {
         </section>
 
         {/* ─── OUR FLEET ─── */}
-        <section className="py-10 sm:py-14 bg-neutral-900">
+        <section data-motion-section="fleet" className="py-10 sm:py-14 bg-neutral-900">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-end justify-between mb-6">
               <div>
@@ -268,7 +269,7 @@ const Home = () => {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
                 {cabs.map((cab) => (
-                  <div key={cab._id} className="bg-neutral-800/80 rounded-2xl border border-neutral-800 overflow-hidden hover:border-orange-500/60 hover:shadow-xl transition-all duration-300 group flex flex-col justify-between">
+                  <div key={cab._id} data-motion-card="fleet" className="bg-neutral-800/80 rounded-2xl border border-neutral-800 overflow-hidden hover:border-orange-500/60 hover:shadow-xl transition-all duration-300 group flex flex-col justify-between">
                     
                     {/* Image Container */}
                     <div className="relative bg-neutral-900/90 h-40 sm:h-44 flex items-center justify-center p-4 border-b border-neutral-800/60">
@@ -326,7 +327,7 @@ const Home = () => {
         </section>
 
         {/* ─── STATS STRIP ─── */}
-        <section className="bg-neutral-900 py-8 sm:py-10">
+        <section data-motion-section="stats" className="bg-neutral-900 py-8 sm:py-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
               {[
@@ -335,7 +336,7 @@ const Home = () => {
                 { num: '500+', label: 'Happy Customers' },
                 { num: '24/7', label: 'Customer Support' },
               ].map(stat => (
-                <div key={stat.label} className="text-center">
+                <div key={stat.label} data-motion-stat className="text-center">
                   <p className="text-2xl sm:text-3xl font-bold text-orange-500">{stat.num}</p>
                   <p className="text-xs sm:text-sm text-gray-400 mt-1">{stat.label}</p>
                 </div>
@@ -345,7 +346,7 @@ const Home = () => {
         </section>
 
         {/* ─── TESTIMONIALS ─── */}
-        <section className="py-10 sm:py-14 bg-neutral-800">
+        <section data-motion-section="testimonials" className="py-10 sm:py-14 bg-neutral-800">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-xl sm:text-2xl font-bold text-white mb-6">What our customers say</h2>
             
@@ -355,7 +356,7 @@ const Home = () => {
                 { name: "Priya M.", city: "Nashik", text: "Transparent pricing with no hidden charges. The fare shown was exactly what I paid. Will use again." },
                 { name: "Amit K.", city: "Mumbai", text: "Used RK Tours for my family trip. Comfortable Innova, professional driver. Highly recommended." }
               ].map((review, i) => (
-                <div key={i} className="bg-neutral-900 rounded-lg border border-neutral-800 p-5">
+                <div key={i} data-motion-card="testimonial" className="bg-neutral-900 rounded-lg border border-neutral-800 p-5">
                   <div className="flex gap-0.5 mb-3">
                     {[1,2,3,4,5].map(s => (
                       <FiStar key={s} className="text-orange-500 fill-orange-500 text-sm" />
@@ -378,7 +379,7 @@ const Home = () => {
         </section>
 
         {/* ─── CTA STRIP ─── */}
-        <section className="bg-orange-500 py-8 sm:py-10">
+        <section data-motion-section="cta" className="bg-orange-500 py-8 sm:py-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
               <h3 className="text-lg sm:text-xl font-bold text-white">Need a cab? Call us directly.</h3>

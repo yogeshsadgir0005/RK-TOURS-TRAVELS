@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../utils/axiosInstance';
 import SEOHead from '../components/SEOHead';
+import PageTransition from '../components/PageTransition';
 import { FiUsers, FiCheckCircle, FiShield } from 'react-icons/fi';
 import { FaStar } from 'react-icons/fa';
 
@@ -44,7 +45,8 @@ const CabDetails = () => {
   if (!cab) return <div className="pt-20 text-center">Cab not found</div>;
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-28 pb-16 font-sans">
+    <PageTransition>
+      <div className="min-h-screen bg-gray-50 pt-28 pb-16 font-sans">
       <SEOHead 
         title={`${cab.name} Cab Booking - Best Fares | RK Tours & Travels`} 
         description={`Book a ${cab.name} (${cab.category}) with RK Tours & Travels. Enjoy a comfortable ride with verified drivers at just ₹${cab.pricePerKm}/km.`}
@@ -144,7 +146,8 @@ const CabDetails = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </PageTransition>
   );
 };
 

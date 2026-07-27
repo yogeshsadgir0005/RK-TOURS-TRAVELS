@@ -1,9 +1,62 @@
+import { useLayoutEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { gsap } from 'gsap';
 import { FiArrowRight, FiMapPin, FiPhone, FiMail } from 'react-icons/fi';
 import { useBranding } from '../context/BrandingContext';
 
 const Footer = () => {
   const { logoUrl, siteName, contentData } = useBranding();
+  const footerRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const footer = footerRef.current;
+    if (!footer || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+
+    let ctx;
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      observer.disconnect();
+
+      ctx = gsap.context(() => {
+        footer.querySelectorAll('[data-footer-column]').forEach((column, index) => {
+          gsap.fromTo(
+            column,
+            {
+              rotateX: index % 2 ? 17 : -17,
+              rotateY: index % 2 ? -11 : 11,
+              scaleX: 0.86,
+              scaleY: 0.9,
+              transformOrigin: index % 2 ? 'center top' : 'center bottom',
+              transformPerspective: 900,
+            },
+            {
+              rotateX: 0,
+              rotateY: 0,
+              scaleX: 1,
+              scaleY: 1,
+              duration: 0.64,
+              delay: index * 0.065,
+              ease: 'back.out(1.35)',
+            }
+          );
+        });
+
+        const pin = footer.querySelector('[data-footer-pin]');
+        if (pin) {
+          gsap.timeline({ defaults: { ease: 'back.out(1.8)' } })
+            .fromTo(pin, { rotateZ: -18, scaleY: 0.72, transformOrigin: '50% 85%' }, { rotateZ: 12, scaleY: 1.08, duration: 0.36 })
+            .to(pin, { rotateZ: 0, scaleY: 1, duration: 0.28 });
+        }
+      }, footer);
+    }, { threshold: 0.08 });
+
+    observer.observe(footer);
+
+    return () => {
+      observer.disconnect();
+      ctx?.revert();
+    };
+  }, []);
 
   const address = contentData?.contactAddress || "Pune, Maharashtra\nIndia 411001";
   const phone = contentData?.contactPhone || "+91 99999 99999";
@@ -11,7 +64,7 @@ const Footer = () => {
   const mapIframe = contentData?.mapIframe || "";
 
   return (
-    <footer className="bg-neutral-900 text-white relative overflow-hidden pt-16 pb-12">
+    <footer ref={footerRef} className="bg-neutral-900 text-white relative overflow-hidden pt-16 pb-12">
       
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         
@@ -19,7 +72,7 @@ const Footer = () => {
         <div className="grid grid-cols-2 lg:grid-cols-6 gap-x-8 gap-y-12 mb-20">
           
           {/* Logo Section (Full width on mobile, 2 cols on desktop) */}
-          <div className="col-span-2 lg:col-span-2 pr-0 lg:pr-8">
+          <div data-footer-column className="col-span-2 lg:col-span-2 pr-0 lg:pr-8">
             <Link to="/" className="flex items-center gap-2 mb-6 group inline-flex">
               {logoUrl ? (
                 <img src={logoUrl} alt={siteName} className="h-14 w-auto object-contain rounded-[10px] transition-transform duration-300 group-hover:scale-105" />
@@ -35,7 +88,7 @@ const Footer = () => {
           </div>
 
           {/* Company */}
-          <div className="col-span-1">
+          <div data-footer-column className="col-span-1">
             <h4 className="text-white font-extrabold text-xs sm:text-sm uppercase tracking-widest mb-6">Company</h4>
             <ul className="space-y-4">
               <li><Link to="/about" className="text-gray-400 text-sm hover:text-white transition-colors duration-200 flex items-center gap-2 group"><span className="hidden sm:inline-block opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all"><FiArrowRight /></span> About Us</Link></li>
@@ -45,7 +98,7 @@ const Footer = () => {
           </div>
 
           {/* Legal */}
-          <div className="col-span-1">
+          <div data-footer-column className="col-span-1">
             <h4 className="text-white font-extrabold text-xs sm:text-sm uppercase tracking-widest mb-6">Legal</h4>
             <ul className="space-y-4">
               <li><Link to="/privacy" className="text-gray-400 text-sm hover:text-white transition-colors duration-200 flex items-center gap-2 group"><span className="hidden sm:inline-block opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all"><FiArrowRight /></span> Privacy Policy</Link></li>
@@ -55,7 +108,7 @@ const Footer = () => {
           </div>
 
           {/* Contact Section */}
-          <div className="col-span-2">
+          <div data-footer-column className="col-span-2">
             <h4 className="text-white font-extrabold text-xs sm:text-sm uppercase tracking-widest mb-6 text-center">Contact</h4>
             <div className="flex flex-col sm:flex-row gap-6">
               
@@ -75,7 +128,7 @@ const Footer = () => {
                 
                 {/* Custom Guaranteed Red Pin Overlay */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[80%] pointer-events-none z-10 drop-shadow-2xl">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-10 h-10 text-red-500 animate-bounce">
+                  <svg data-footer-pin xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-10 h-10 text-red-500">
                     <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
                   </svg>
                   <div className="w-3 h-1 bg-black/40 rounded-full mx-auto mt-1 blur-[1px]"></div>

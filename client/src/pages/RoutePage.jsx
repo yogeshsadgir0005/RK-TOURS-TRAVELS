@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom';
 import SEOHead from '../components/SEOHead';
 import BookingForm from '../components/BookingForm';
+import PageTransition from '../components/PageTransition';
 
 const RoutePage = () => {
   const { routeSlug } = useParams(); // e.g., mumbai-to-pune
@@ -11,7 +12,8 @@ const RoutePage = () => {
   const drop = cities[1].charAt(0).toUpperCase() + cities[1].slice(1);
 
   return (
-    <div className="bg-neutral-900 min-h-screen text-white">
+    <PageTransition>
+      <div className="bg-neutral-900 min-h-screen text-white">
       <SEOHead 
         title={`Cab from ${pickup} to ${drop} - Best One Way Taxi Fares | RK Tours & Travels`} 
         description={`Book cheap and reliable cabs from ${pickup} to ${drop}. Experienced drivers, clean cars, and timely service. 24/7 customer support.`} 
@@ -37,7 +39,8 @@ const RoutePage = () => {
         <BookingForm defaultPickup={pickup} defaultDrop={drop} />
       </div>
       
-    </div>
+      </div>
+    </PageTransition>
   );
 };
 export default RoutePage;

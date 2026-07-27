@@ -1,7 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { AnimatePresence } from 'framer-motion';
 import Navbar from './components/Navbar';
 import BottomNav from './components/BottomNav';
 import Footer from './components/Footer';
@@ -40,8 +39,7 @@ function App() {
             <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-black"></div>
           </div>
         }>
-          <AnimatePresence mode="wait">
-            <Routes location={location} key={location.pathname}>
+          <Routes location={location} key={location.pathname}>
               <Route path="/" element={<Home />} />
               {/* Protected from Logged-in users */}
               <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
@@ -64,8 +62,7 @@ function App() {
                   <Profile />
                 </ProtectedRoute>
               } />
-            </Routes>
-          </AnimatePresence>
+          </Routes>
         </Suspense>
       </main>
       <Footer />
