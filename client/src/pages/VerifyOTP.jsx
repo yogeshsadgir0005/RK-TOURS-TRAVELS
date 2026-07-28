@@ -95,7 +95,7 @@ const VerifyOTP = () => {
       );
     }
     return (
-      <div className={`w-12 h-12 ${mobile ? 'bg-black text-white' : 'bg-white text-black'} rounded-xl flex items-center justify-center font-black text-2xl shadow-saas-inner ${!mobile ? 'hover:scale-105 transition-transform duration-300' : ''}`}>
+      <div className={`w-12 h-12 bg-orange-500 text-white rounded-xl flex items-center justify-center font-black text-2xl shadow-saas-inner ${!mobile ? 'hover:scale-105 transition-transform duration-300' : ''}`}>
         {siteName?.charAt(0) || 'R'}
       </div>
     );
@@ -135,8 +135,8 @@ const VerifyOTP = () => {
             </div>
 
             <div className="mb-10 text-center lg:text-left">
-              <h2 className="text-3xl font-extrabold text-black tracking-tight mb-2">Check your email</h2>
-              <p className="text-sm text-gray-500 font-medium">We've sent a 6-digit code to <span className="font-bold text-black">{tempEmail}</span></p>
+              <h2 className="text-3xl font-extrabold text-white tracking-tight mb-2">Check your email</h2>
+              <p className="text-sm text-gray-500 font-medium">We've sent a 6-digit code to <span className="font-bold text-white">{tempEmail}</span></p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-8">
@@ -151,7 +151,7 @@ const VerifyOTP = () => {
                     value={data}
                     onChange={(e) => handleChange(e.target, index)}
                     onKeyDown={(e) => handleKeyDown(e, index)}
-                    className="w-12 h-12 sm:w-14 sm:h-14 text-center text-2xl font-black bg-gray-50/50 border border-gray-200 rounded-xl focus:border-black focus:bg-white shadow-saas-inner outline-none transition-colors"
+                    className="w-12 h-12 sm:w-14 sm:h-14 text-center text-2xl font-black bg-neutral-900 border border-neutral-700 text-white rounded-xl focus:border-orange-500 shadow-saas-inner outline-none transition-colors"
                   />
                 ))}
               </div>
@@ -159,14 +159,14 @@ const VerifyOTP = () => {
               <button 
                 type="submit" 
                 disabled={isLoading}
-                className="w-full h-12 mt-4 bg-gradient-to-b from-neutral-800 to-black text-white rounded-xl font-bold text-sm shadow-saas-glow border border-black/10 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-70 disabled:hover:scale-100"
+                className="w-full h-12 mt-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2 transition-colors disabled:opacity-70"
               >
                 {isLoading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <>Verify & Continue <FiArrowRight /></>}
               </button>
             </form>
 
             <p className="mt-8 text-center text-sm text-gray-500 font-medium">
-              Didn't receive the code? <button className="text-black font-bold hover:underline">Resend</button>
+              Didn't receive the code? <button className="text-orange-500 font-bold hover:underline">Resend</button>
             </p>
           </div>
         </div>

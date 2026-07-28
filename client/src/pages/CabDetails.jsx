@@ -1,151 +1,151 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { FiArrowLeft, FiArrowRight, FiCheckCircle, FiShield, FiUsers } from 'react-icons/fi';
 import axiosInstance from '../utils/axiosInstance';
+import { DEFAULT_CABS } from '../data/defaultData';
 import SEOHead from '../components/SEOHead';
 import PageTransition from '../components/PageTransition';
-import { FiUsers, FiCheckCircle, FiShield } from 'react-icons/fi';
-import { FaStar } from 'react-icons/fa';
 
 const CabDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [cab, setCab] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [cab, setCab] = useState(() => DEFAULT_CABS.find((item) => String(item._id) === String(id)) || null);
+  const [loading, setLoading] = useState(!cab);
 
   useEffect(() => {
-    const fetchCab = async () => {
-      try {
-        const res = await axiosInstance.get(`/cabs/${id}`);
-        setCab(res.data);
-      } catch (error) {
-        console.error("Cab not found");
-      } finally {
-        setLoading(false);
-      }
+    let active = true;
+
+    axiosInstance.get(`/cabs/${id}`)
+      .then(({ data }) => {
+        if (active && data) setCab(data);
+      })
+      .catch(() => {
+        if (!active) return;
+        const cached = JSON.parse(sessionStorage.getItem('cabsData') || '[]');
+        setCab(cached.find((item) => String(item._id) === String(id)) || DEFAULT_CABS.find((item) => String(item._id) === String(id)) || null);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
     };
-    fetchCab();
   }, [id]);
 
   const handleProceedToBook = () => {
-    // Send to booking page with generic journey data if accessed directly from Fleet page
     navigate('/book', {
       state: {
         cab,
-        journey: { pickup: 'TBD', drop: 'TBD', date: 'TBD', tripType: 'One Way' }
-      }
+        journey: {
+          pickup: '',
+          drop: '',
+          date: new Date().toISOString().split('T')[0],
+          tripType: 'one-way',
+        },
+      },
     });
   };
 
-  if (loading) return (
-    <div className="min-h-screen pt-20 flex justify-center items-start">
-      <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-b-4 border-black"></div>
-    </div>
-  );
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-neutral-950">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-white/15 border-t-orange-500" />
+      </div>
+    );
+  }
 
-  if (!cab) return <div className="pt-20 text-center">Cab not found</div>;
+  if (!cab) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-neutral-950 px-4 text-center text-white">
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500">Vehicle unavailable</p>
+        <h1 className="mt-3 text-3xl font-black">This cab could not be found.</h1>
+        <button onClick={() => navigate('/fleet')} className="mt-6 rounded-xl bg-orange-500 px-6 py-3 text-sm font-black">Return to fleet</button>
+      </div>
+    );
+  }
+
+  const includedFeatures = cab.features?.length
+    ? cab.features
+    : ['GPS tracking', 'First aid kit', 'Clean interiors'];
 
   return (
     <PageTransition>
-      <div className="min-h-screen bg-gray-50 pt-28 pb-16 font-sans">
-      <SEOHead 
-        title={`${cab.name} Cab Booking - Best Fares | RK Tours & Travels`} 
-        description={`Book a ${cab.name} (${cab.category}) with RK Tours & Travels. Enjoy a comfortable ride with verified drivers at just ₹${cab.pricePerKm}/km.`}
-        url={`/cab/${cab._id}`}
-        keywords={`book ${cab.name}, ${cab.category} cab booking, hire ${cab.name} taxi, affordable ${cab.category} cabs`}
-        schemaMarkup={{
-          "@context": "https://schema.org",
-          "@type": "Product",
-          "name": cab.name,
-          "image": cab.image,
-          "description": `Book a ${cab.category} cab - ${cab.name}.`,
-          "offers": {
-            "@type": "Offer",
-            "priceCurrency": "INR",
-            "price": cab.pricePerKm,
-            "availability": "https://schema.org/InStock"
-          }
-        }}
-      />
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <button onClick={() => navigate(-1)} className="text-black font-bold hover:underline mb-6 inline-block transition-all">
-          ← Back
-        </button>
-        
-        <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden flex flex-col md:flex-row">
-          {/* Image Section */}
-          <div className="md:w-1/2 bg-gray-50 p-8 flex items-center justify-center border-b md:border-b-0 md:border-r border-gray-100">
-            <img src={cab.image || 'https://via.placeholder.com/600x400?text=Cab'} alt={cab.name} className="max-w-full max-h-80 object-contain mix-blend-multiply" />
-          </div>
+      <div className="min-h-screen bg-neutral-950 pb-20 pt-28 text-white">
+        <SEOHead
+          title={`${cab.name} Cab Booking | RK Tours & Travels`}
+          description={`Book a ${cab.name} with a verified driver for clear per-kilometre pricing.`}
+          url={`/cab/${cab._id}`}
+        />
 
-          {/* Details Section */}
-          <div className="md:w-1/2 p-8 lg:p-10 flex flex-col">
-            <div className="flex justify-between items-start mb-2">
-              <div>
-                <h1 className="text-3xl font-extrabold text-black tracking-tight">{cab.name}</h1>
-                <p className="text-gray-500 font-medium capitalize mt-1">{cab.category || 'Premium'}</p>
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="mb-7 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-white/45 transition-colors hover:text-white"
+          >
+            <FiArrowLeft /> Back
+          </button>
+
+          <div className="overflow-hidden rounded-[30px] border border-white/10 bg-neutral-900 shadow-[0_28px_80px_rgba(0,0,0,0.36)] lg:grid lg:grid-cols-[1.08fr_.92fr]">
+            <div className="relative flex min-h-[360px] items-center justify-center overflow-hidden border-b border-white/10 bg-[#171717] p-8 lg:min-h-[560px] lg:border-b-0 lg:border-r">
+              <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,.2)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.2)_1px,transparent_1px)] [background-size:38px_38px]" />
+              <span className="absolute left-7 top-7 rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.16em] text-white/65">
+                Ready to dispatch
+              </span>
+              <img
+                src={cab.image || 'https://via.placeholder.com/600x400?text=Cab'}
+                alt={cab.name}
+                className="relative max-h-[360px] max-w-full object-contain drop-shadow-[0_24px_26px_rgba(0,0,0,0.45)]"
+              />
+              <p className="absolute bottom-6 left-7 text-[10px] font-black uppercase tracking-[0.2em] text-white/25">RK vehicle directory</p>
+            </div>
+
+            <div className="flex flex-col p-6 sm:p-9 lg:p-11">
+              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-orange-500">{cab.category || 'Premium'} class</p>
+              <div className="mt-3 flex items-start justify-between gap-5">
+                <div>
+                  <h1 className="text-3xl font-black tracking-tight sm:text-4xl">{cab.name}</h1>
+                  <p className="mt-2 text-sm font-semibold text-white/40">{cab.vehicleNumber || 'Vehicle assigned before dispatch'}</p>
+                </div>
+                <div className="flex-shrink-0 text-right">
+                  <p className="text-[8px] font-black uppercase tracking-[0.16em] text-white/35">Starts at</p>
+                  <p className="mt-1 text-3xl font-black">&#8377;{cab.pricePerKm}<span className="text-xs text-white/40">/km</span></p>
+                </div>
               </div>
-              <div className="text-right">
-                <div className="text-3xl font-extrabold text-black">₹{cab.pricePerKm}<span className="text-base text-gray-500 font-medium">/km</span></div>
+
+              <div className="mt-8 grid grid-cols-3 overflow-hidden rounded-xl border border-white/10 bg-black/20">
+                <span className="flex min-h-14 items-center justify-center gap-2 border-r border-white/10 px-2 text-xs font-bold text-white/60"><FiUsers className="text-orange-500" /> {cab.seats} seats</span>
+                <span className="flex min-h-14 items-center justify-center border-r border-white/10 px-2 text-xs font-bold text-white/60">{cab.fuelType || 'Diesel'}</span>
+                <span className="flex min-h-14 items-center justify-center px-2 text-xs font-bold text-white/60">{cab.acStatus || 'AC'}</span>
               </div>
-            </div>
 
-            <div className="flex items-center gap-2 mb-8">
-             {/* NEW INTEGRATION: Vehicle Number Display Badge */}
-              {cab.vehicleNumber && (
-                <span className="flex items-center gap-2 bg-gray-100 border border-gray-200 px-4 py-2 rounded-xl text-sm text-black tracking-widest ">
-                  {cab.vehicleNumber}
-                </span>
-              )}
-            </div>
-
-            <div className="flex flex-wrap gap-3 mb-8">
-            
-              <span className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-xl text-sm font-bold text-gray-800">
-                <FiUsers /> {cab.seats} Seats
-              </span>
-              <span className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-xl text-sm font-bold text-gray-800">
-                {cab.fuelType || 'Diesel'}
-              </span>
-              <span className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-xl text-sm font-bold text-gray-800">
-                {cab.acStatus || 'AC'}
-              </span>
-            </div>
-
-            <div className="mb-10">
-              <h3 className="font-bold text-black text-lg mb-4">Features included</h3>
-              <div className="grid grid-cols-2 gap-4 text-sm font-medium text-gray-600">
-                {cab.features && cab.features.length > 0 ? (
-                  cab.features.map((feature, idx) => (
-                    <div key={idx} className="flex items-center gap-2.5">
-                      <FiCheckCircle className="text-black flex-shrink-0 text-base" /> {feature}
+              <div className="mt-8">
+                <h2 className="text-sm font-black uppercase tracking-[0.14em] text-white">Included with every ride</h2>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  {includedFeatures.map((feature) => (
+                    <div key={feature} className="flex items-center gap-2.5 text-sm font-semibold text-white/55">
+                      <FiCheckCircle className="flex-shrink-0 text-orange-500" /> {feature}
                     </div>
-                  ))
-                ) : (
-                  <>
-                    <div className="flex items-center gap-2.5"><FiCheckCircle className="text-black text-base"/> GPS Tracking</div>
-                    <div className="flex items-center gap-2.5"><FiCheckCircle className="text-black text-base"/> First Aid Kit</div>
-                    <div className="flex items-center gap-2.5"><FiCheckCircle className="text-black text-base"/> Clean Interiors</div>
-                  </>
-                )}
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-10 flex flex-col gap-3 sm:flex-row lg:mt-auto">
+                <button
+                  type="button"
+                  onClick={handleProceedToBook}
+                  className="flex h-13 flex-1 items-center justify-center gap-2 rounded-xl bg-orange-500 text-sm font-black transition-colors hover:bg-orange-600"
+                >
+                  Book this cab <FiArrowRight />
+                </button>
+                <div className="flex h-13 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-5 text-xs font-bold text-white/60">
+                  <FiShield className="text-orange-500" /> Safe ride
+                </div>
               </div>
             </div>
-
-            {/* Actions */}
-            <div className="flex items-center gap-4 mt-auto">
-              <button 
-                onClick={handleProceedToBook}
-                className="flex-grow bg-black hover:bg-neutral-800 text-white font-bold py-4 rounded-xl transition-all text-base shadow-md focus:outline-none focus:ring-4 focus:ring-neutral-200"
-              >
-                Book Now
-              </button>
-              <div className="border border-gray-200 rounded-xl px-5 py-4 flex items-center gap-2 text-black font-semibold text-sm bg-white shadow-sm flex-shrink-0 cursor-default">
-                <FiShield className="text-black text-xl" /> Safe Ride
-              </div>
-            </div>
-
           </div>
         </div>
-      </div>
       </div>
     </PageTransition>
   );

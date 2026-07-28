@@ -9,6 +9,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useModal } from '../context/ModalContext';
 import { getDeviceId } from '../utils/getDeviceId';
 
+const MotionDiv = motion.div;
+
 const BookingAccordion = ({ booking, onCancel }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -17,7 +19,7 @@ const BookingAccordion = ({ booking, onCancel }) => {
       case 'confirmed': return 'bg-green-100 text-green-800';
       case 'completed': return 'bg-gray-100 text-gray-800';
       case 'cancelled': return 'bg-red-100 text-red-800';
-      default: return 'bg-blue-100 text-blue-800';
+      default: return 'bg-orange-500/15 text-orange-300';
     }
   };
 
@@ -41,7 +43,7 @@ const BookingAccordion = ({ booking, onCancel }) => {
             </div>
             <h3 className="text-lg font-bold text-white tracking-tight">
               {booking.pickup?.city || 'Pickup'} 
-              <span className="text-gray-400 mx-2">→</span> 
+              <span className="text-orange-500 mx-2">&rarr;</span> 
               {booking.destination?.city || 'Drop'}
             </h3>
           </div>
@@ -50,12 +52,12 @@ const BookingAccordion = ({ booking, onCancel }) => {
         <div className="flex items-center justify-between sm:justify-end gap-6 sm:w-auto w-full">
           <div className="text-left sm:text-right">
              <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-0.5">Total Fare</span>
-             <span className="text-xl font-black text-white">₹{booking.totalFare || booking.estimatedRate || 0}</span>
+             <span className="text-xl font-black text-white">&#8377;{booking.totalFare || booking.estimatedRate || 0}</span>
           </div>
           <div className="w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center text-gray-400">
-             <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
+             <MotionDiv animate={{ rotate: isOpen ? 180 : 0 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
                <FiChevronDown />
-             </motion.div>
+             </MotionDiv>
           </div>
         </div>
       </div>
@@ -63,7 +65,7 @@ const BookingAccordion = ({ booking, onCancel }) => {
       {/* Body (Collapsible) */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div 
+          <MotionDiv 
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -121,7 +123,7 @@ const BookingAccordion = ({ booking, onCancel }) => {
               </div>
 
             </div>
-          </motion.div>
+          </MotionDiv>
         )}
       </AnimatePresence>
     </div>
@@ -145,7 +147,7 @@ const MyBookings = () => {
     try {
       const res = await axiosInstance.get(`/bookings/mybookings?deviceId=${getDeviceId()}`);
       setBookings(res.data);
-    } catch (error) {
+    } catch {
       toast.error('Failed to load bookings');
     } finally {
       setLoading(false);
@@ -161,7 +163,7 @@ const MyBookings = () => {
       const res = await axiosInstance.get(`/bookings/mybookings?phone=${phoneInput}`);
       setBookings(res.data);
       if (res.data.length === 0) toast.error('No bookings found for this number');
-    } catch (error) {
+    } catch {
       toast.error('Failed to load bookings');
     } finally {
       setLoading(false);
@@ -244,7 +246,7 @@ const MyBookings = () => {
                 {searchMethod === 'phone' && (
                   <div className="mb-6 flex justify-between items-center bg-neutral-800 p-4 rounded-2xl border border-neutral-800">
                      <span className="text-sm font-medium text-gray-400">Showing bookings for <strong className="text-white">{phoneInput}</strong></span>
-                     <button onClick={() => { setPhoneInput(''); fetchBookingsByDevice(); }} className="text-xs font-bold text-blue-600 hover:underline">Clear</button>
+                     <button onClick={() => { setPhoneInput(''); fetchBookingsByDevice(); }} className="text-xs font-bold text-orange-500 hover:underline">Clear</button>
                   </div>
                 )}
                 {bookings.length === 0 && searchMethod === 'phone' ? (

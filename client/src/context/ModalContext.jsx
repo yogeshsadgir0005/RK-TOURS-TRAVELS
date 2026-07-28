@@ -1,8 +1,11 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiXCircle, FiAlertCircle, FiCheckCircle, FiInfo } from 'react-icons/fi';
 
 const ModalContext = createContext();
+const MotionButton = motion.button;
+const MotionDiv = motion.div;
 
 export const useModal = () => useContext(ModalContext);
 
@@ -13,99 +16,97 @@ export const ModalProvider = ({ children }) => {
     message: '',
     confirmText: 'Confirm',
     cancelText: 'Cancel',
-    type: 'warning', // 'warning', 'danger', 'info', 'success'
+    type: 'warning',
     onConfirm: null,
     onCancel: null,
   });
 
-  const showConfirm = useCallback((options) => {
-    return new Promise((resolve) => {
-      setModalState({
-        isOpen: true,
-        title: options.title || 'Confirm Action',
-        message: options.message || 'Are you sure you want to proceed?',
-        confirmText: options.confirmText || 'Confirm',
-        cancelText: options.cancelText || 'Cancel',
-        type: options.type || 'warning',
-        onConfirm: () => {
-          setModalState(s => ({ ...s, isOpen: false }));
-          resolve(true);
-        },
-        onCancel: () => {
-          setModalState(s => ({ ...s, isOpen: false }));
-          resolve(false);
-        }
-      });
+  const showConfirm = useCallback((options) => new Promise((resolve) => {
+    setModalState({
+      isOpen: true,
+      title: options.title || 'Confirm Action',
+      message: options.message || 'Are you sure you want to proceed?',
+      confirmText: options.confirmText || 'Confirm',
+      cancelText: options.cancelText || 'Cancel',
+      type: options.type || 'warning',
+      onConfirm: () => {
+        setModalState((state) => ({ ...state, isOpen: false }));
+        resolve(true);
+      },
+      onCancel: () => {
+        setModalState((state) => ({ ...state, isOpen: false }));
+        resolve(false);
+      },
     });
-  }, []);
+  }), []);
 
-  const getIcon = () => {
-    switch(modalState.type) {
-      case 'danger': return <FiXCircle className="text-3xl text-red-500" />;
-      case 'success': return <FiCheckCircle className="text-3xl text-green-500" />;
-      case 'info': return <FiInfo className="text-3xl text-blue-500" />;
-      case 'warning': default: return <FiAlertCircle className="text-3xl text-orange-500" />;
-    }
+  const iconStyles = {
+    danger: ['text-red-400', 'bg-red-500/10 border-red-500/20'],
+    success: ['text-emerald-400', 'bg-emerald-500/10 border-emerald-500/20'],
+    info: ['text-orange-400', 'bg-orange-500/10 border-orange-500/20'],
+    warning: ['text-orange-400', 'bg-orange-500/10 border-orange-500/20'],
   };
-
-  const getIconBg = () => {
-    switch(modalState.type) {
-      case 'danger': return 'bg-red-50 border-red-100';
-      case 'success': return 'bg-green-50 border-green-100';
-      case 'info': return 'bg-blue-50 border-blue-100';
-      case 'warning': default: return 'bg-orange-50 border-orange-100';
-    }
-  };
-
-  const getConfirmBtnColor = () => {
-    switch(modalState.type) {
-      case 'danger': return 'bg-red-500 hover:bg-red-600 shadow-red-500/25 text-white';
-      case 'success': return 'bg-green-500 hover:bg-green-600 shadow-green-500/25 text-white';
-      case 'info': return 'bg-blue-500 hover:bg-blue-600 shadow-blue-500/25 text-white';
-      case 'warning': default: return 'bg-orange-500 hover:bg-orange-600 shadow-orange-500/25 text-white';
-    }
-  };
+  const [iconColor, iconBackground] = iconStyles[modalState.type] || iconStyles.warning;
+  const Icon = modalState.type === 'danger'
+    ? FiXCircle
+    : modalState.type === 'success'
+      ? FiCheckCircle
+      : modalState.type === 'info'
+        ? FiInfo
+        : FiAlertCircle;
+  const confirmClass = modalState.type === 'danger'
+    ? 'bg-red-500 hover:bg-red-600 shadow-red-500/20'
+    : modalState.type === 'success'
+      ? 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20'
+      : 'bg-orange-500 hover:bg-orange-600 shadow-orange-500/20';
 
   return (
     <ModalContext.Provider value={{ showConfirm }}>
       {children}
       <AnimatePresence>
         {modalState.isOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div 
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <MotionButton
+              type="button"
+              aria-label="Close dialog"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/75 backdrop-blur-sm"
               onClick={modalState.onCancel}
-            ></motion.div>
-            <motion.div 
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              className="relative w-full max-w-sm bg-white rounded-3xl p-6 shadow-2xl border border-gray-100 text-center"
+            />
+            <MotionDiv
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="rk-modal-title"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 12 }}
+              transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              className="relative w-full max-w-sm rounded-[28px] border border-white/10 bg-neutral-900 p-6 text-center shadow-2xl"
             >
-              <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border ${getIconBg()}`}>
-                {getIcon()}
+              <div className={`mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border ${iconBackground}`}>
+                <Icon className={`text-3xl ${iconColor}`} />
               </div>
-              <h3 className="text-xl font-black text-black mb-2">{modalState.title}</h3>
-              <p className="text-sm font-medium text-gray-500 mb-8">{modalState.message}</p>
+              <h3 id="rk-modal-title" className="mb-2 text-xl font-black text-white">{modalState.title}</h3>
+              <p className="mb-8 text-sm font-medium leading-relaxed text-gray-400">{modalState.message}</p>
               <div className="flex gap-3">
-                <button 
+                <button
+                  type="button"
                   onClick={modalState.onCancel}
-                  className="flex-1 h-12 bg-gray-50 hover:bg-gray-100 text-black font-bold text-sm rounded-xl border border-gray-200 transition-colors"
+                  className="h-12 flex-1 rounded-xl border border-white/10 bg-neutral-800 text-sm font-bold text-white transition-colors hover:bg-neutral-700"
                 >
                   {modalState.cancelText}
                 </button>
-                <button 
+                <button
+                  type="button"
                   onClick={modalState.onConfirm}
-                  className={`flex-1 h-12 font-bold text-sm rounded-xl shadow-lg transition-colors ${getConfirmBtnColor()}`}
+                  className={`h-12 flex-1 rounded-xl text-sm font-bold text-white shadow-lg transition-colors ${confirmClass}`}
                 >
                   {modalState.confirmText}
                 </button>
               </div>
-            </motion.div>
+            </MotionDiv>
           </div>
         )}
       </AnimatePresence>

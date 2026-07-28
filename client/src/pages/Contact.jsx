@@ -18,7 +18,7 @@ const Contact = () => {
       await axiosInstance.post('/messages', formData);
       toast.success('Message sent successfully!');
       setFormData({ name: '', email: '', message: '' });
-    } catch (error) {
+    } catch {
       toast.error('Failed to send message');
     } finally {
       setLoading(false);

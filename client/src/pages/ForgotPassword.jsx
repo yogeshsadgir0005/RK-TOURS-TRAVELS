@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { FiArrowLeft, FiArrowRight, FiMail } from 'react-icons/fi';
 import axiosInstance from '../utils/axiosInstance';
 import SEOHead from '../components/SEOHead';
 import PageTransition from '../components/PageTransition';
@@ -10,16 +11,16 @@ const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setLoading(true);
     setError('');
+
     try {
       await axiosInstance.post('/auth/forgot-password', { email });
-      // Navigate to OTP page telling it this is a password reset flow
       navigate('/verify-otp', { state: { email, intent: 'reset-password' } });
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to send reset link.');
+    } catch (requestError) {
+      setError(requestError.response?.data?.message || 'Failed to send reset link.');
     } finally {
       setLoading(false);
     }
@@ -27,49 +28,62 @@ const ForgotPassword = () => {
 
   return (
     <PageTransition>
-      <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 pt-24 font-sans">
-      <SEOHead title="Forgot Password" description="Reset your CabBook account password" />
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-black tracking-tight">Reset password</h2>
-        <p className="mt-2 text-center text-sm text-gray-500 font-medium">Enter your email and we'll send you an OTP.</p>
-      </div>
+      <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-neutral-950 px-4 pb-16 pt-28">
+        <SEOHead title="Forgot Password | RK Tours" description="Reset your RK Tours account password." />
+        <div className="absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(255,255,255,.18)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.18)_1px,transparent_1px)] [background-size:42px_42px]" />
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow-sm border border-gray-200 sm:rounded-2xl sm:px-10">
-          {error && <div className="mb-6 bg-red-50 p-4 rounded-xl border border-red-200 text-red-700 text-sm font-medium">{error}</div>}
-          
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Email address</label>
-              <input 
-                type="email" 
-                required 
-                value={email} 
-                onChange={(e) => setEmail(e.target.value)}
-                className="appearance-none block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-black focus:border-transparent transition-all sm:text-sm text-black" 
-              />
-            </div>
+        <div className="relative w-full max-w-md">
+          <Link
+            to="/login"
+            className="mb-6 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-white/45 transition-colors hover:text-white"
+          >
+            <FiArrowLeft /> Back to login
+          </Link>
 
-            <div className="pt-2">
-              <button 
-                type="submit" 
+          <div className="rounded-[28px] border border-white/10 bg-neutral-900 p-6 shadow-[0_24px_70px_rgba(0,0,0,0.38)] sm:p-8">
+            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-orange-500">Account recovery</p>
+            <h1 className="mt-3 text-3xl font-black tracking-tight text-white">Reset your password.</h1>
+            <p className="mt-2 text-sm leading-relaxed text-white/50">Enter your email and we will send a six-digit verification code.</p>
+
+            {error && (
+              <div className="mt-6 rounded-xl border border-red-500/25 bg-red-500/10 p-4 text-sm font-semibold text-red-300">
+                {error}
+              </div>
+            )}
+
+            <form className="mt-7 space-y-5" onSubmit={handleSubmit}>
+              <div>
+                <label className="mb-2 block text-[10px] font-black uppercase tracking-[0.16em] text-white/45">Email address</label>
+                <div className="relative">
+                  <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-500" />
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    className="h-12 w-full rounded-xl border border-white/10 bg-neutral-950 pl-11 pr-4 text-sm font-semibold text-white outline-none transition-colors placeholder:text-white/30 focus:border-orange-500"
+                    placeholder="you@example.com"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
                 disabled={loading}
-                className="w-full flex justify-center items-center gap-2 py-3.5 px-4 border border-transparent rounded-xl shadow-md text-sm font-bold text-white bg-black hover:bg-neutral-800 disabled:opacity-70 transition-all"
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-orange-500 text-sm font-black text-white transition-colors hover:bg-orange-600 disabled:opacity-60"
               >
-                {loading ? <div className="w-5 h-5 border-2 border-neutral-600 border-t-white rounded-full animate-spin"></div> : 'Send OTP'}
+                {loading ? (
+                  <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/35 border-t-white" />
+                ) : (
+                  <>Send verification code <FiArrowRight /></>
+                )}
               </button>
-            </div>
-          </form>
-          
-          <div className="mt-8 text-center">
-            <Link to="/login" className="text-sm font-semibold text-black hover:underline transition-colors">
-              ← Back to login
-            </Link>
+            </form>
           </div>
         </div>
-      </div>
       </div>
     </PageTransition>
   );
 };
+
 export default ForgotPassword;

@@ -48,10 +48,9 @@
 @layer utilities {
   .aurora-bg {
     background-color: #000;
-    background-image: 
-      radial-gradient(at 20% 0%, hsla(253,80%,30%,0.4) 0, transparent 50%), 
-      radial-gradient(at 80% 0%, hsla(339,80%,30%,0.4) 0, transparent 50%), 
-      radial-gradient(at 50% 100%, hsla(225,80%,40%,0.3) 0, transparent 50%);
+    background-image:
+      radial-gradient(at 18% 8%, rgba(255,255,255,0.08) 0, transparent 42%),
+      radial-gradient(at 82% 88%, rgba(255,255,255,0.05) 0, transparent 45%);
     filter: blur(60px);
   }
 
@@ -89,9 +88,118 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #3f3f46;
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #f97316;
+}
+
+/* Card-only shutter and directional slide motion */
+.card-motion {
+  position: relative;
+  isolation: isolate;
+}
+
+.card-motion::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: 40;
+  pointer-events: none;
+  visibility: hidden;
+  background:
+    linear-gradient(
+      135deg,
+      #111111 0%,
+      #1f1f1f 76%,
+      #2b2b2b 100%
+    );
+}
+
+.card-motion.is-card-motion-active {
+  overflow: hidden;
+  will-change: transform;
+}
+
+.card-motion.is-card-motion-active::after {
+  visibility: visible;
+  will-change: transform;
+}
+
+.card-motion--left.is-card-motion-active {
+  animation: card-slide-left 560ms cubic-bezier(0.22, 1, 0.36, 1) var(--card-motion-delay, 0ms) both;
+}
+
+.card-motion--right.is-card-motion-active {
+  animation: card-slide-right 560ms cubic-bezier(0.22, 1, 0.36, 1) var(--card-motion-delay, 0ms) both;
+}
+
+.card-motion--up.is-card-motion-active {
+  animation: card-slide-up 560ms cubic-bezier(0.22, 1, 0.36, 1) var(--card-motion-delay, 0ms) both;
+}
+
+.card-motion--down.is-card-motion-active {
+  animation: card-slide-down 560ms cubic-bezier(0.22, 1, 0.36, 1) var(--card-motion-delay, 0ms) both;
+}
+
+.card-motion--left.is-card-motion-active::after {
+  transform-origin: right;
+  animation: card-shutter-x 520ms cubic-bezier(0.77, 0, 0.18, 1) var(--card-motion-delay, 0ms) both;
+}
+
+.card-motion--right.is-card-motion-active::after {
+  transform-origin: left;
+  animation: card-shutter-x 520ms cubic-bezier(0.77, 0, 0.18, 1) var(--card-motion-delay, 0ms) both;
+}
+
+.card-motion--up.is-card-motion-active::after {
+  transform-origin: bottom;
+  animation: card-shutter-y 520ms cubic-bezier(0.77, 0, 0.18, 1) var(--card-motion-delay, 0ms) both;
+}
+
+.card-motion--down.is-card-motion-active::after {
+  transform-origin: top;
+  animation: card-shutter-y 520ms cubic-bezier(0.77, 0, 0.18, 1) var(--card-motion-delay, 0ms) both;
+}
+
+@keyframes card-slide-left {
+  from { transform: translate3d(-30px, 0, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes card-slide-right {
+  from { transform: translate3d(30px, 0, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes card-slide-up {
+  from { transform: translate3d(0, 24px, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes card-slide-down {
+  from { transform: translate3d(0, -24px, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes card-shutter-x {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+@keyframes card-shutter-y {
+  from { transform: scaleY(1); }
+  to { transform: scaleY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-motion,
+  .card-motion::after {
+    animation: none !important;
+  }
+
+  .card-motion::after {
+    display: none;
+  }
 }

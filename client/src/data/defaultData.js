@@ -175,7 +175,7 @@ export const mergeDataById = (defaultItems = [], fetchedItems = []) => {
 // High quality city images mapping for city avatars
 export const CITY_IMAGES = {
   mumbai: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&w=120&q=80",
-  pune: "https://images.unsplash.com/photo-1605335870020-f50c059cf3b1?auto=format&fit=crop&w=120&q=80",
+  pune: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Shaniwar_Wada.jpg/1280px-Shaniwar_Wada.jpg",
   nashik: "https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?auto=format&fit=crop&w=120&q=80",
   nagpur: "https://images.unsplash.com/photo-1627894098939-c189ec322a36?auto=format&fit=crop&w=120&q=80",
   shirdi: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=120&q=80",

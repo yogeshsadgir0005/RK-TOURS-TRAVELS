@@ -1,70 +1,17 @@
-import { useLayoutEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { gsap } from 'gsap';
 import { FiArrowRight, FiMapPin, FiPhone, FiMail } from 'react-icons/fi';
 import { useBranding } from '../context/BrandingContext';
 
 const Footer = () => {
   const { logoUrl, siteName, contentData } = useBranding();
-  const footerRef = useRef(null);
 
-  useLayoutEffect(() => {
-    const footer = footerRef.current;
-    if (!footer || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
-
-    let ctx;
-    const observer = new IntersectionObserver((entries) => {
-      if (!entries.some((entry) => entry.isIntersecting)) return;
-      observer.disconnect();
-
-      ctx = gsap.context(() => {
-        footer.querySelectorAll('[data-footer-column]').forEach((column, index) => {
-          gsap.fromTo(
-            column,
-            {
-              rotateX: index % 2 ? 17 : -17,
-              rotateY: index % 2 ? -11 : 11,
-              scaleX: 0.86,
-              scaleY: 0.9,
-              transformOrigin: index % 2 ? 'center top' : 'center bottom',
-              transformPerspective: 900,
-            },
-            {
-              rotateX: 0,
-              rotateY: 0,
-              scaleX: 1,
-              scaleY: 1,
-              duration: 0.64,
-              delay: index * 0.065,
-              ease: 'back.out(1.35)',
-            }
-          );
-        });
-
-        const pin = footer.querySelector('[data-footer-pin]');
-        if (pin) {
-          gsap.timeline({ defaults: { ease: 'back.out(1.8)' } })
-            .fromTo(pin, { rotateZ: -18, scaleY: 0.72, transformOrigin: '50% 85%' }, { rotateZ: 12, scaleY: 1.08, duration: 0.36 })
-            .to(pin, { rotateZ: 0, scaleY: 1, duration: 0.28 });
-        }
-      }, footer);
-    }, { threshold: 0.08 });
-
-    observer.observe(footer);
-
-    return () => {
-      observer.disconnect();
-      ctx?.revert();
-    };
-  }, []);
 
   const address = contentData?.contactAddress || "Pune, Maharashtra\nIndia 411001";
   const phone = contentData?.contactPhone || "+91 99999 99999";
   const email = contentData?.contactEmail || "support@rktours.com";
-  const mapIframe = contentData?.mapIframe || "";
 
   return (
-    <footer ref={footerRef} className="bg-neutral-900 text-white relative overflow-hidden pt-16 pb-12">
+    <footer className="bg-neutral-900 text-white relative overflow-hidden pt-16 pb-12">
       
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         
@@ -93,7 +40,7 @@ const Footer = () => {
             <ul className="space-y-4">
               <li><Link to="/about" className="text-gray-400 text-sm hover:text-white transition-colors duration-200 flex items-center gap-2 group"><span className="hidden sm:inline-block opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all"><FiArrowRight /></span> About Us</Link></li>
               <li><Link to="/contact" className="text-gray-400 text-sm hover:text-white transition-colors duration-200 flex items-center gap-2 group"><span className="hidden sm:inline-block opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all"><FiArrowRight /></span> Contact</Link></li>
-              <li><Link to="/careers" className="text-gray-400 text-sm hover:text-white transition-colors duration-200 flex items-center gap-2 group"><span className="hidden sm:inline-block opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all"><FiArrowRight /></span> Careers</Link></li>
+              <li><Link to="/fleet" className="text-gray-400 text-sm hover:text-white transition-colors duration-200 flex items-center gap-2 group"><span className="hidden sm:inline-block opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all"><FiArrowRight /></span> Fleet</Link></li>
             </ul>
           </div>
 
@@ -103,7 +50,7 @@ const Footer = () => {
             <ul className="space-y-4">
               <li><Link to="/privacy" className="text-gray-400 text-sm hover:text-white transition-colors duration-200 flex items-center gap-2 group"><span className="hidden sm:inline-block opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all"><FiArrowRight /></span> Privacy Policy</Link></li>
               <li><Link to="/terms" className="text-gray-400 text-sm hover:text-white transition-colors duration-200 flex items-center gap-2 group"><span className="hidden sm:inline-block opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all"><FiArrowRight /></span> Terms</Link></li>
-              <li><Link to="/cancellation" className="text-gray-400 text-sm hover:text-white transition-colors duration-200 flex items-center gap-2 group"><span className="hidden sm:inline-block opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all"><FiArrowRight /></span> Cancellation</Link></li>
+              <li><Link to="/contact" className="text-gray-400 text-sm hover:text-white transition-colors duration-200 flex items-center gap-2 group"><span className="hidden sm:inline-block opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all"><FiArrowRight /></span> Support</Link></li>
             </ul>
           </div>
 
@@ -158,7 +105,7 @@ const Footer = () => {
 
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-gray-500 text-sm font-medium">
-            © {new Date().getFullYear()} {siteName}. All rights reserved.
+           &copy; {new Date().getFullYear()} {siteName}. All rights reserved.
           </p>
           <div className="flex gap-4">
             <span className="text-gray-500 text-sm">Designed for reliability</span>

@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import citiesData from '../data/cities.json';
 import { motion, AnimatePresence } from 'framer-motion';
 
+const MotionDiv = motion.div;
+
 const CityAutocomplete = ({ value, onChange, placeholder, icon: Icon, iconColorClass = "text-black", darkTheme = false }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -62,7 +64,7 @@ const CityAutocomplete = ({ value, onChange, placeholder, icon: Icon, iconColorC
 
       <AnimatePresence>
         {isOpen && suggestions.length > 0 && (
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0, y: 4, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 4, scale: 0.98 }}
@@ -86,7 +88,7 @@ const CityAutocomplete = ({ value, onChange, placeholder, icon: Icon, iconColorC
                 </li>
               ))}
             </ul>
-          </motion.div>
+          </MotionDiv>
         )}
       </AnimatePresence>
     </div>

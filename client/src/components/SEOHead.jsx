@@ -1,6 +1,5 @@
 import { Helmet } from 'react-helmet-async';
 import { useState, useEffect } from 'react';
-import axiosInstance from '../utils/axiosInstance';
 
 const SEOHead = ({ title, description, url, keywords, schemaMarkup, ogImage = "https://rk-tours-travels.vercel.app/default-og-image.jpg" }) => {
   const [faviconUrl, setFaviconUrl] = useState('/RK1.png');
@@ -34,7 +33,7 @@ const SEOHead = ({ title, description, url, keywords, schemaMarkup, ogImage = "h
       
       try {
         setFaviconUrl(canvas.toDataURL('image/png'));
-      } catch (e) {
+      } catch {
         console.warn("CORS prevented dynamic favicon rounding");
       }
     };

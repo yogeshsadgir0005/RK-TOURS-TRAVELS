@@ -21,7 +21,7 @@ export default defineConfig({
         short_name: 'RK Travels',
         description: 'Premium Intercity Cab Booking Service',
         theme_color: '#000000',
-        background_color: '#ffffff',
+        background_color: '#121212',
         display: 'standalone',
         icons: [
           {

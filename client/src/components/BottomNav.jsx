@@ -1,26 +1,9 @@
-import { useLayoutEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FiHome, FiList, FiPhone } from 'react-icons/fi';
-import { gsap } from 'gsap';
 
 const BottomNav = () => {
   const location = useLocation();
-  const navRef = useRef(null);
-
-  useLayoutEffect(() => {
-    const indicator = navRef.current?.querySelector('[data-bottom-nav-active]');
-    if (!indicator || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
-
-    const tween = gsap.fromTo(
-      indicator,
-      { scaleX: 0.15, rotateZ: -12, transformOrigin: 'center' },
-      { scaleX: 1, rotateZ: 0, duration: 0.55, ease: 'elastic.out(1, 0.55)' }
-    );
-
-    return () => tween.kill();
-  }, [location.pathname]);
-
-  if (['/login', '/signup', '/verify-otp'].includes(location.pathname)) return null;
+  if (['/login', '/signup', '/verify-otp', '/forgot-password'].includes(location.pathname)) return null;
 
   const tabs = [
     { to: '/', icon: FiHome, label: 'Home' },
@@ -29,7 +12,7 @@ const BottomNav = () => {
   ];
 
   return (
-    <div ref={navRef} className="md:hidden fixed bottom-0 left-0 right-0 z-50">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 z-50">
       <div className="absolute inset-0 bg-neutral-900/95 backdrop-blur-md border-t border-white/10"></div>
 
       <div className="relative flex justify-around items-center h-[68px] px-2 pb-[env(safe-area-inset-bottom)]">
@@ -40,7 +23,7 @@ const BottomNav = () => {
               {active && (
                 <div
                   data-bottom-nav-active
-                  className="absolute top-1.5 inset-x-4 h-0.5 bg-orange-500 rounded-full"
+                  className="bottom-nav-indicator absolute top-1.5 inset-x-4 h-0.5 bg-orange-500 rounded-full"
                 />
               )}
               <tab.icon className={`text-[20px] mb-0.5 ${active ? 'text-orange-500' : 'text-gray-500'}`} />

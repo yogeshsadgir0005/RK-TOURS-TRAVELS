@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useLayoutEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
@@ -23,9 +23,17 @@ const Terms = lazy(() => import('./pages/Terms'));
 const SearchResults = lazy(() => import('./pages/SearchResults'));
 const CabDetails = lazy(() => import('./pages/CabDetails'));
 const BookingPage = lazy(() => import('./pages/BookingPage'));
+const Fleet = lazy(() => import('./pages/Fleet'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 function App() {
   const location = useLocation();
+
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [location.pathname]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -36,7 +44,7 @@ function App() {
       <main className="flex-grow pb-16 md:pb-0"> {/* Padding bottom for mobile BottomNav */}
         <Suspense fallback={
           <div className="flex items-center justify-center min-h-[70vh]">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-black"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-orange-500"></div>
           </div>
         }>
           <Routes location={location} key={location.pathname}>
@@ -52,6 +60,7 @@ function App() {
               <Route path="/terms" element={<Terms />} />
               <Route path="/search" element={<SearchResults />} />
               <Route path="/cab/:id" element={<CabDetails />} />
+              <Route path="/fleet" element={<Fleet />} />
               <Route path="/city/:citySlug" element={<CityPage />} />
               <Route path="/cabs/:routeSlug" element={<RoutePage />} />
               <Route path="/book" element={<BookingPage />} />
@@ -62,6 +71,7 @@ function App() {
                   <Profile />
                 </ProtectedRoute>
               } />
+              <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
       </main>

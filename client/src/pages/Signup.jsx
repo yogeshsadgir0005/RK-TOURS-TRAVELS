@@ -44,7 +44,7 @@ const Signup = () => {
       );
     }
     return (
-      <div className={`w-12 h-12 ${mobile ? 'bg-black text-white' : 'bg-white text-black'} rounded-xl flex items-center justify-center font-black text-2xl shadow-saas-inner ${!mobile ? 'hover:scale-105 transition-transform duration-300' : ''}`}>
+      <div className={`w-12 h-12 bg-orange-500 text-white rounded-xl flex items-center justify-center font-black text-2xl shadow-saas-inner ${!mobile ? 'hover:scale-105 transition-transform duration-300' : ''}`}>
         {siteName?.charAt(0) || 'R'}
       </div>
     );
@@ -84,7 +84,7 @@ const Signup = () => {
             </div>
 
             <div className="mb-10 text-center lg:text-left">
-              <h2 className="text-3xl font-extrabold text-black tracking-tight mb-2">Create an account</h2>
+              <h2 className="text-3xl font-extrabold text-white tracking-tight mb-2">Create an account</h2>
               <p className="text-sm text-gray-500 font-medium">Enter your details to get started.</p>
             </div>
 
@@ -98,7 +98,7 @@ const Signup = () => {
                     required 
                     value={name} 
                     onChange={(e) => setName(e.target.value)} 
-                    className="w-full h-12 pl-11 pr-4 bg-gray-50/50 border border-gray-200 rounded-xl text-sm font-semibold text-black focus:border-black focus:bg-white shadow-saas-inner outline-none transition-colors" 
+                    className="w-full h-12 pl-11 pr-4 bg-white border border-transparent rounded-xl text-sm font-semibold text-neutral-900 focus:border-orange-500 shadow-md outline-none transition-colors" 
                   />
                 </div>
               </div>
@@ -112,7 +112,7 @@ const Signup = () => {
                     required 
                     value={email} 
                     onChange={(e) => setEmail(e.target.value)} 
-                    className="w-full h-12 pl-11 pr-4 bg-gray-50/50 border border-gray-200 rounded-xl text-sm font-semibold text-black focus:border-black focus:bg-white shadow-saas-inner outline-none transition-colors" 
+                    className="w-full h-12 pl-11 pr-4 bg-white border border-transparent rounded-xl text-sm font-semibold text-neutral-900 focus:border-orange-500 shadow-md outline-none transition-colors" 
                   />
                 </div>
               </div>
@@ -126,7 +126,7 @@ const Signup = () => {
                     required 
                     value={password} 
                     onChange={(e) => setPassword(e.target.value)} 
-                    className="w-full h-12 pl-11 pr-4 bg-gray-50/50 border border-gray-200 rounded-xl text-sm font-semibold text-black focus:border-black focus:bg-white shadow-saas-inner outline-none transition-colors" 
+                    className="w-full h-12 pl-11 pr-4 bg-white border border-transparent rounded-xl text-sm font-semibold text-neutral-900 focus:border-orange-500 shadow-md outline-none transition-colors" 
                   />
                 </div>
               </div>
@@ -134,14 +134,14 @@ const Signup = () => {
               <button 
                 type="submit" 
                 disabled={isLoading}
-                className="w-full h-12 mt-4 bg-gradient-to-b from-neutral-800 to-black text-white rounded-xl font-bold text-sm shadow-saas-glow border border-black/10 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-70 disabled:hover:scale-100"
+                className="w-full h-12 mt-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2 transition-colors disabled:opacity-70"
               >
                 {isLoading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <>Create Account <FiArrowRight /></>}
               </button>
             </form>
 
             <p className="mt-8 text-center text-sm text-gray-500 font-medium">
-              Already have an account? <Link to="/login" className="text-black font-bold hover:underline">Log in</Link>
+              Already have an account? <Link to="/login" className="text-orange-500 font-bold hover:underline">Log in</Link>
             </p>
           </div>
         </div>
