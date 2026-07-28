@@ -163,10 +163,7 @@ const Home = () => {
               </div>
 
               <div data-motion-booking className="relative bg-neutral-950/55 supports-[backdrop-filter]:bg-neutral-950/30 backdrop-blur-2xl backdrop-saturate-150 border border-white/25 rounded-[28px] p-4 sm:p-6 shadow-[0_24px_80px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.10)] ring-1 ring-white/5 overflow-visible">
-                <div className="absolute -top-3 left-5 flex items-center gap-2 bg-orange-500 text-white px-3 py-1.5 rounded-full">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
-                  <span className="text-[10px] font-black uppercase tracking-[0.18em]">Trip console</span>
-                </div>
+                
 
                 <div className="flex items-center justify-between pt-2 mb-5">
                   <div>
